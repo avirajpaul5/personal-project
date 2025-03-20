@@ -14,6 +14,7 @@ const initialApps: WindowType[] = [
     icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTEwIDIwdi02aDR2Nkg2di05aDEydjloLTJ6TTEyIDNoOHY2aC04eiIvPjwvc3ZnPg==",
     isOpen: false,
     isMaximized: false,
+    isMinimized: false,
     component: () => (
       <div className="text-center p-8">
         <h1 className="text-4xl font-bold mb-4">Portfolio OS</h1>
@@ -29,6 +30,7 @@ const initialApps: WindowType[] = [
     icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTEgMTVoLTJ2LTZoMnY2em0wLThoLTJWN2gydjJ6Ii8+PC9zdmc+",
     isOpen: false,
     isMaximized: false,
+    isMinimized: false,
     component: About,
   },
   {
@@ -37,6 +39,7 @@ const initialApps: WindowType[] = [
     icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTEwIDRINGMtMS4xIDAtMS45OS45LTEuOTkgMkwyIDE4YzAgMS4xLjkgMiAyIDJoMTZjMS4xIDAgMi0uOSAyLTJWOGMwLTEuMS0uOS0yLTItMmgtOGwtMi0yeiIvPjwvc3ZnPg==",
     isOpen: false,
     isMaximized: false,
+    isMinimized: false,
     component: Projects,
   },
   {
@@ -45,16 +48,35 @@ const initialApps: WindowType[] = [
     icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTIwIDRINGMtMS4xIDAtMS45OS45LTEuOTkgMkwyIDE4YzAgMS4xLjkgMiAyIDJoMTZjMS4xIDAgMi0uOSAyLTJWNmMwLTEuMS0uOS0yLTItMnptMCAxNEg0VjhoMTZ2MTB6Ii8+PC9zdmc+",
     isOpen: false,
     isMaximized: false,
+    isMinimized: false,
     component: Contact,
   },
 ];
 
 function App() {
-  const [apps, setApps] = useState(initialApps);
+  const [apps, setApps] = useState<WindowType[]>(initialApps);
+
+  const onMinimizeApp = (id: string) => {
+    setApps((prev) =>
+      prev.map((app) =>
+        app.id === id ? { ...app, isMinimized: true, isOpen: false } : app
+      )
+    );
+  };
+
+  const onRestoreApp = (id: string) => {
+    setApps((prevApps) =>
+      prevApps.map((app) =>
+        app.id === id ? { ...app, isMinimized: false, isOpen: true } : app
+      )
+    );
+  };
 
   const handleAppClick = (id: string) => {
-    setApps(
-      apps.map((app) => (app.id === id ? { ...app, isOpen: !app.isOpen } : app))
+    setApps((prevApps) =>
+      prevApps.map((app) =>
+        app.id === id ? { ...app, isOpen: true, isMinimized: false } : app
+      )
     );
   };
 
@@ -66,7 +88,9 @@ function App() {
 
   const handleMinimize = (id: string) => {
     setApps(
-      apps.map((app) => (app.id === id ? { ...app, isOpen: false } : app))
+      apps.map((app) =>
+        app.id === id ? { ...app, isMinimized: true, isOpen: false } : app
+      )
     );
   };
 
@@ -83,6 +107,7 @@ function App() {
       <Navbar />
       <div className="relative w-full h-full pt-7">
         {apps.map((app) => {
+          if (!app.isOpen || app.isMinimized) return null;
           const AppComponent = app.component;
           return (
             <Window
@@ -99,7 +124,12 @@ function App() {
           );
         })}
       </div>
-      <Dock apps={apps} onAppClick={handleAppClick} />
+      <Dock
+        apps={apps}
+        onAppClick={handleAppClick}
+        onMinimizeApp={onMinimizeApp}
+        onRestoreApp={onRestoreApp}
+      />
     </div>
   );
 }
