@@ -1,84 +1,88 @@
-import { useState } from 'react';
-import { Window as WindowType } from './types';
-import Window from './components/Window';
-import Dock from './components/Dock';
-import Navbar from './components/Navbar';
-import About from './components/About';
-import Projects from './components/Projects';
-import Contact from './components/Contact';
+import { useState } from "react";
+import { Window as WindowType } from "./types";
+import Window from "./components/Window";
+import Dock from "./components/Dock";
+import Navbar from "./components/Navbar";
+import About from "./components/About";
+import Projects from "./components/Projects";
+import Contact from "./components/Contact";
 
 const initialApps: WindowType[] = [
   {
-    id: 'home',
-    title: 'Home',
-    icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTEwIDIwdi02aDR2Nkg2di05aDEydjloLTJ6TTEyIDNoOHY2aC04eiIvPjwvc3ZnPg==',
+    id: "home",
+    title: "Home",
+    icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTEwIDIwdi02aDR2Nkg2di05aDEydjloLTJ6TTEyIDNoOHY2aC04eiIvPjwvc3ZnPg==",
     isOpen: false,
     isMaximized: false,
     component: () => (
       <div className="text-center p-8">
         <h1 className="text-4xl font-bold mb-4">Portfolio OS</h1>
-        <p className="text-xl text-gray-600">Click on an app in the dock to explore my portfolio</p>
+        <p className="text-xl text-gray-600">
+          Click on an app in the dock to explore my portfolio
+        </p>
       </div>
-    )
+    ),
   },
   {
-    id: 'about',
-    title: 'About',
-    icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTEgMTVoLTJ2LTZoMnY2em0wLThoLTJWN2gydjJ6Ii8+PC9zdmc+',
+    id: "about",
+    title: "About",
+    icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTEgMTVoLTJ2LTZoMnY2em0wLThoLTJWN2gydjJ6Ii8+PC9zdmc+",
     isOpen: false,
     isMaximized: false,
-    component: About
+    component: About,
   },
   {
-    id: 'projects',
-    title: 'Projects',
-    icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTEwIDRINGMtMS4xIDAtMS45OS45LTEuOTkgMkwyIDE4YzAgMS4xLjkgMiAyIDJoMTZjMS4xIDAgMi0uOSAyLTJWOGMwLTEuMS0uOS0yLTItMmgtOGwtMi0yeiIvPjwvc3ZnPg==',
+    id: "projects",
+    title: "Projects",
+    icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTEwIDRINGMtMS4xIDAtMS45OS45LTEuOTkgMkwyIDE4YzAgMS4xLjkgMiAyIDJoMTZjMS4xIDAgMi0uOSAyLTJWOGMwLTEuMS0uOS0yLTItMmgtOGwtMi0yeiIvPjwvc3ZnPg==",
     isOpen: false,
     isMaximized: false,
-    component: Projects
+    component: Projects,
   },
   {
-    id: 'contact',
-    title: 'Contact',
-    icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTIwIDRINGMtMS4xIDAtMS45OS45LTEuOTkgMkwyIDE4YzAgMS4xLjkgMiAyIDJoMTZjMS4xIDAgMi0uOSAyLTJWNmMwLTEuMS0uOS0yLTItMnptMCAxNEg0VjhoMTZ2MTB6Ii8+PC9zdmc+',
+    id: "contact",
+    title: "Contact",
+    icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTIwIDRINGMtMS4xIDAtMS45OS45LTEuOTkgMkwyIDE4YzAgMS4xLjkgMiAyIDJoMTZjMS4xIDAgMi0uOSAyLTJWNmMwLTEuMS0uOS0yLTItMnptMCAxNEg0VjhoMTZ2MTB6Ii8+PC9zdmc+",
     isOpen: false,
     isMaximized: false,
-    component: Contact
-  }
+    component: Contact,
+  },
 ];
 
 function App() {
   const [apps, setApps] = useState(initialApps);
 
   const handleAppClick = (id: string) => {
-    setApps(apps.map(app => 
-      app.id === id ? { ...app, isOpen: !app.isOpen } : app
-    ));
+    setApps(
+      apps.map((app) => (app.id === id ? { ...app, isOpen: !app.isOpen } : app))
+    );
   };
 
   const handleClose = (id: string) => {
-    setApps(apps.map(app => 
-      app.id === id ? { ...app, isOpen: false } : app
-    ));
+    setApps(
+      apps.map((app) => (app.id === id ? { ...app, isOpen: false } : app))
+    );
   };
 
   const handleMinimize = (id: string) => {
-    setApps(apps.map(app => 
-      app.id === id ? { ...app, isOpen: false } : app
-    ));
+    setApps(
+      apps.map((app) => (app.id === id ? { ...app, isOpen: false } : app))
+    );
   };
 
   const handleMaximize = (id: string) => {
-    setApps(apps.map(app => 
-      app.id === id ? { ...app, isMaximized: !app.isMaximized } : app
-    ));
+    setApps(
+      apps.map((app) =>
+        app.id === id ? { ...app, isMaximized: !app.isMaximized } : app
+      )
+    );
   };
 
   return (
     <div className="h-screen bg-gradient-to-br from-blue-500 to-purple-600 overflow-hidden">
       <Navbar />
       <div className="relative w-full h-full pt-7">
-        {apps.map(app => {
+        {apps.map((app) => {
           const AppComponent = app.component;
           return (
             <Window

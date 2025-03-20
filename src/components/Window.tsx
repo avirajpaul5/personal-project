@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
-import { Rnd } from 'react-rnd';
-import { XMarkIcon, MinusIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/solid';
-import clsx from 'clsx';
+import { useState, useEffect, useRef } from "react";
+import { Rnd } from "react-rnd";
+import { X, Minus, Maximize } from "lucide-react";
+import clsx from "clsx";
 
 interface WindowProps {
   title: string;
@@ -20,7 +20,7 @@ export default function Window({
   onMinimize,
   onMaximize,
   isMaximized,
-  children
+  children,
 }: WindowProps) {
   const [position, setPosition] = useState({ x: 100, y: 100 });
   const [size, setSize] = useState({ width: 600, height: 400 });
@@ -48,12 +48,11 @@ export default function Window({
 
   const handleClose = () => {
     setIsClosing(true);
-    // Wait for animation to complete before hiding the window
     setTimeout(() => {
       onClose();
       setIsClosing(false);
       setIsVisible(false);
-    }, 400); // Match this with CSS animation duration
+    }, 400);
   };
 
   const handleMinimize = () => {
@@ -73,6 +72,18 @@ export default function Window({
     onMaximize();
   };
 
+  const handleDragStop = (e: any, d: { x: number; y: number }) => {
+    // Get window dimensions
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    // Prevent dragging out of bounds
+    const newX = Math.max(0, Math.min(d.x, windowWidth - size.width));
+    const newY = Math.max(0, Math.min(d.y, windowHeight - size.height));
+
+    setPosition({ x: newX, y: newY });
+  };
+
   if (!isOpen && !isClosing && !isVisible) return null;
 
   return (
@@ -84,9 +95,9 @@ export default function Window({
         zIndex: 1000,
         transition: "width 0.3s, height 0.3s, transform 0.3s",
       }}
-      size={isMaximized ? { width: '100%', height: '100%' } : size}
+      size={isMaximized ? { width: "100%", height: "100%" } : size}
       position={isMaximized ? { x: 0, y: 0 } : position}
-      onDragStop={(e, d) => setPosition({ x: d.x, y: d.y })}
+      onDragStop={handleDragStop}
       onResize={(e, direction, ref, delta, position) => {
         setSize({
           width: parseInt(ref.style.width),
@@ -97,6 +108,7 @@ export default function Window({
       dragHandleClassName="window-handle"
       disableDragging={isMaximized}
       enableResizing={!isMaximized}
+      bounds="window" // Ensures the window stays within the viewport
     >
       <div
         ref={windowRef}
@@ -112,22 +124,28 @@ export default function Window({
           <div className="flex space-x-2">
             <button
               onClick={handleClose}
-              className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-600 transition-colors"
-            />
+              className="w-4 h-4 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 transition-colors"
+            >
+              <X size={10} className="text-white" />
+            </button>
             <button
               onClick={handleMinimize}
-              className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-600 transition-colors"
-            />
+              className="w-4 h-4 flex items-center justify-center rounded-full bg-yellow-500 hover:bg-yellow-600 transition-colors"
+            >
+              <Minus size={10} className="text-white" />
+            </button>
             <button
               onClick={handleMaximize}
-              className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-600 transition-colors"
-            />
+              className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500 hover:bg-green-600 transition-colors"
+            >
+              <Maximize size={10} className="text-white" />
+            </button>
           </div>
-          <span className="flex-1 text-center text-sm font-medium text-gray-700">{title}</span>
+          <span className="flex-1 text-center text-sm font-medium text-gray-700">
+            {title}
+          </span>
         </div>
-        <div className="flex-1 overflow-auto p-4">
-          {children}
-        </div>
+        <div className="flex-1 overflow-auto p-4">{children}</div>
       </div>
     </Rnd>
   );

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Window } from '../types';
+import { useState } from "react";
+import { Window } from "../types";
 
 interface DockProps {
   apps: Window[];
@@ -19,17 +19,18 @@ export default function Dock({ apps, onAppClick }: DockProps) {
               onMouseEnter={() => setHoveredApp(app.id)}
               onMouseLeave={() => setHoveredApp(null)}
               className={`
-                relative transition-all duration-200 ease-in-out p-2 rounded-xl
-                hover:bg-white/10
-                ${hoveredApp === app.id ? 'scale-125' : 'scale-100'}
-              `}
+      relative transition-all duration-200 ease-in-out p-2 rounded-xl
+      hover:bg-white/10
+      ${hoveredApp === app.id ? "scale-125" : "scale-100"}
+    `}
             >
-              <img
-                src={app.icon}
-                alt={app.title}
-                className="w-10 h-10"
-              />
+              <img src={app.icon} alt={app.title} className="w-10 h-10" />
             </button>
+            {hoveredApp === app.id && (
+              <div className="absolute bottom-full mb-2 px-2 py-1 text-sm text-white bg-black/80 rounded-md whitespace-nowrap">
+                {app.title}
+              </div>
+            )}
             {app.isOpen && (
               <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white" />
             )}
