@@ -6,4 +6,6 @@ export interface Window {
   isMaximized: boolean;
   isMinimized: boolean;
   component: React.ComponentType;
+  x: number; // Add this
+  y: number; // Add this
 }

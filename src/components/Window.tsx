@@ -11,6 +11,9 @@ interface WindowProps {
   onMaximize: () => void;
   isMaximized: boolean;
   children: React.ReactNode;
+  x: number;
+  y: number;
+  onPositionChange: (x: number, y: number) => void;
 }
 
 export default function Window({
@@ -21,8 +24,10 @@ export default function Window({
   onMaximize,
   isMaximized,
   children,
+  x,
+  y,
+  onPositionChange,
 }: WindowProps) {
-  const [position, setPosition] = useState({ x: 100, y: 100 });
   const [size, setSize] = useState({ width: 600, height: 400 });
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -38,13 +43,6 @@ export default function Window({
       setIsMinimizing(false);
     }
   }, [isOpen, isClosing]);
-
-  useEffect(() => {
-    if (isMaximized) {
-      previousSize.current = size;
-      previousPosition.current = position;
-    }
-  }, [isMaximized]);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -64,24 +62,16 @@ export default function Window({
     }, 400);
   };
 
-  const handleMaximize = () => {
-    if (!isMaximized) {
-      previousSize.current = size;
-      previousPosition.current = position;
-    }
-    onMaximize();
-  };
-
-  const handleDragStop = (e: any, d: { x: number; y: number }) => {
-    // Get window dimensions
+  const handleDragStop = (_e: any, d: { x: number; y: number }) => {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    // Prevent dragging out of bounds
+    // Calculate bounded coordinates
     const newX = Math.max(0, Math.min(d.x, windowWidth - size.width));
     const newY = Math.max(0, Math.min(d.y, windowHeight - size.height));
 
-    setPosition({ x: newX, y: newY });
+    // Update parent with new position
+    onPositionChange(newX, newY);
   };
 
   if (!isOpen && !isClosing && !isVisible) return null;
@@ -96,19 +86,19 @@ export default function Window({
         transition: "width 0.3s, height 0.3s, transform 0.3s",
       }}
       size={isMaximized ? { width: "100%", height: "100%" } : size}
-      position={isMaximized ? { x: 0, y: 0 } : position}
+      position={isMaximized ? { x: 0, y: 0 } : { x, y }}
       onDragStop={handleDragStop}
-      onResize={(e, direction, ref, delta, position) => {
+      onResize={(_e, _direction, ref, _delta, position) => {
         setSize({
           width: parseInt(ref.style.width),
           height: parseInt(ref.style.height),
         });
-        setPosition(position);
+        onPositionChange(position.x, position.y);
       }}
       dragHandleClassName="window-handle"
       disableDragging={isMaximized}
       enableResizing={!isMaximized}
-      bounds="window" // Ensures the window stays within the viewport
+      bounds="window"
     >
       <div
         ref={windowRef}
@@ -135,7 +125,7 @@ export default function Window({
               <Minus size={10} className="text-white" />
             </button>
             <button
-              onClick={handleMaximize}
+              onClick={onMaximize}
               className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500 hover:bg-green-600 transition-colors"
             >
               <Maximize size={10} className="text-white" />
