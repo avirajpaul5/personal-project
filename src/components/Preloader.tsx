@@ -14,17 +14,17 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
   useEffect(() => {
     const hours = new Date().getHours();
     if (hours >= 5 && hours < 12) {
-      setGreeting("Good morning");
-      setQuip("Early bird gets the worm, eh? 🐦");
+      setGreeting("Good morning ☀️");
+      setQuip("Seizing the day already? ☕");
     } else if (hours >= 12 && hours < 17) {
-      setGreeting("Good afternoon");
-      setQuip("Taking a productive break, I see! ☕");
+      setGreeting("Good afternoon 🌞");
+      setQuip("A productive break, or just some digital wandering? 👀💡");
     } else if (hours >= 17 && hours < 21) {
-      setGreeting("Good evening");
-      setQuip("Still grinding away? 💻");
+      setGreeting("Good evening 🌆");
+      setQuip("Still in the zone? Keep going. 🚀");
     } else {
-      setGreeting("Hello night owl");
-      setQuip("Coding by moonlight? 🌙");
+      setGreeting("Hello, night owl 🌙");
+      setQuip("Burning the midnight oil? 🔥💻");
     }
 
     const interval = setInterval(() => {
@@ -33,7 +33,7 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
           clearInterval(interval);
           setTimeout(() => {
             setLoading(false);
-            onFinish(); // Notify parent when loading is done
+            onFinish();
           }, 800);
           return 100;
         }
@@ -43,33 +43,6 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
 
     return () => clearInterval(interval);
   }, [onFinish]);
-
-  // (The rest of your animation variants remains unchanged)
-
-  const letterVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: i * 0.06,
-        duration: 0.35,
-        ease: [0.22, 1, 0.36, 1],
-      },
-    }),
-  };
-
-  const spinnerVariants = {
-    animate: {
-      rotate: 360,
-      scale: [1, 1.1, 1],
-      transition: {
-        duration: 1.2,
-        ease: "linear",
-        repeat: Infinity,
-      },
-    },
-  };
 
   return (
     <AnimatePresence>
@@ -81,98 +54,61 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
             transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
           }}
         >
-          <motion.div className="mb-12" variants={spinnerVariants} animate="animate">
+          {/* Spinner */}
+          <motion.div
+            className="mb-8"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1.2, ease: "linear", repeat: Infinity }}
+          >
             <svg width="40" height="40" viewBox="0 0 40 40">
               <circle
                 cx="20"
                 cy="20"
                 r="18"
-                fill="none"
                 stroke="#E5E5E5"
                 strokeWidth="2"
-                className="dark:opacity-20"
+                fill="none"
               />
               <motion.circle
                 cx="20"
                 cy="20"
                 r="18"
-                fill="none"
                 stroke="#007AFF"
                 strokeWidth="3"
                 strokeLinecap="round"
-                className="dark:stroke-blue-500"
+                fill="none"
                 strokeDasharray="113"
                 strokeDashoffset="113"
                 animate={{ strokeDashoffset: 0 }}
-                transition={{
-                  duration: 1.5,
-                  ease: "linear",
-                  repeat: Infinity,
-                }}
+                transition={{ duration: 1.5, ease: "linear", repeat: Infinity }}
               />
             </svg>
           </motion.div>
 
+          {/* Progress Bar */}
+          <div className="w-64 h-1 bg-gray-100 dark:bg-gray-600 rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              className="h-full rounded-full bg-gray-900 dark:bg-gray-200"
+              transition={{ ease: "easeOut", duration: 0.5 }}
+            />
+          </div>
+          <motion.p className="mt-2 text-xs text-gray-500 dark:text-gray-400 font-mono">
+            {Math.round(progress)}%
+          </motion.p>
+
+          {/* Greeting and Quip */}
           <motion.div
+            className="text-center mt-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
-            className="text-center"
+            transition={{ delay: 0.5, duration: 0.6 }}
           >
-            <div className="mb-12">
-              <div className="w-64 h-1 bg-gray-100 dark:bg-gray-600 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress}%` }}
-                  className="h-full rounded-full bg-gray-900 dark:bg-gray-200"
-                  transition={{ ease: "easeOut", duration: 0.5 }}
-                />
-              </div>
-              <motion.p className="mt-3 text-xs text-gray-500 dark:text-gray-400 font-mono">
-                {Math.round(progress)}%
-              </motion.p>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <div className="overflow-hidden mb-1">
-                <motion.h1
-                  className="text-gray-900 dark:text-white font-medium text-3xl"
-                  initial={{ y: 40 }}
-                  animate={{ y: 0 }}
-                  transition={{
-                    duration: 0.5,
-                    ease: [0.22, 1, 0.36, 1],
-                    delay: 0.2,
-                  }}
-                >
-                  {greeting.split("").map((char, index) => (
-                    <motion.span
-                      key={index}
-                      custom={index}
-                      variants={letterVariants}
-                      initial="hidden"
-                      animate="visible"
-                      className="inline-block"
-                    >
-                      {char === " " ? "\u00A0" : char}
-                    </motion.span>
-                  ))}
-                </motion.h1>
-              </div>
-
-              <motion.p
-                className="text-gray-500 dark:text-gray-400 font-normal text-lg"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{
-                  duration: 0.6,
-                  ease: "easeOut",
-                  delay: 0.8,
-                }}
-              >
-                {quip}
-              </motion.p>
-            </div>
+            <h1 className="text-gray-900 dark:text-white font-medium text-2xl">
+              {greeting}
+            </h1>
+            <p className="text-gray-500 dark:text-gray-400 text-base">{quip}</p>
           </motion.div>
         </motion.div>
       )}

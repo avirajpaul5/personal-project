@@ -24,7 +24,7 @@ export default function Dock({
         {apps
           .filter((app) => !app.isMinimized)
           .map((app) => (
-            <div key={app.id} className="relative">
+            <div key={app.id} className="relative group">
               <button
                 onClick={() =>
                   app.isOpen ? onMinimizeApp(app.id) : onAppClick(app.id)
@@ -38,6 +38,10 @@ export default function Dock({
           `}
               >
                 <img src={app.icon} alt={app.title} className="w-10 h-10" />
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 bg-black/80 text-white text-xs rounded-md whitespace-nowrap">
+                  {app.title}
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-black/80 transform rotate-45 -mb-1"></div>
+                </div>
               </button>
               {app.isOpen && !app.isMinimized && (
                 <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white" />

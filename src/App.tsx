@@ -19,6 +19,7 @@ const initialApps: WindowType[] = [
     isMinimized: false,
     x: 100,
     y: 100,
+    lastActive: 0,
     component: () => (
       <div className="text-center p-8">
         <h1 className="text-4xl font-bold mb-4">Portfolio OS</h1>
@@ -37,6 +38,7 @@ const initialApps: WindowType[] = [
     isMinimized: false,
     x: 100,
     y: 100,
+    lastActive: 0,
     component: About,
   },
   {
@@ -48,6 +50,7 @@ const initialApps: WindowType[] = [
     isMinimized: false,
     x: 100,
     y: 100,
+    lastActive: 0,
     component: Projects,
   },
   {
@@ -59,6 +62,7 @@ const initialApps: WindowType[] = [
     isMinimized: false,
     x: 100,
     y: 100,
+    lastActive: 0,
     component: Contact,
   },
 ];
@@ -89,6 +93,7 @@ function App() {
             isMinimized: false,
             x: 100 + offset,
             y: 100 + offset,
+            lastActive: Date.now(),
           };
         }
         return app;
@@ -107,7 +112,14 @@ function App() {
   const onRestoreApp = (id: string) => {
     setApps((prevApps) =>
       prevApps.map((app) =>
-        app.id === id ? { ...app, isMinimized: false, isOpen: true } : app
+        app.id === id
+          ? {
+              ...app,
+              isMinimized: false,
+              isOpen: true,
+              lastActive: Date.now(), // Update activation time
+            }
+          : app
       )
     );
   };
@@ -143,7 +155,7 @@ function App() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-blue-500 to-purple-600 overflow-hidden">
+    <div className="h-screen bg-black overflow-hidden">
       {loading ? (
         <MacOSPreloader onFinish={() => setLoading(false)} />
       ) : (
@@ -155,28 +167,31 @@ function App() {
         >
           <Navbar />
           <div className="relative w-full h-full pt-7">
-            {apps.map((app) => {
-              if (!app.isOpen || app.isMinimized) return null;
-              const AppComponent = app.component;
-              return (
-                <Window
-                  key={app.id}
-                  title={app.title}
-                  isOpen={app.isOpen}
-                  isMaximized={app.isMaximized}
-                  x={app.x}
-                  y={app.y}
-                  onPositionChange={(newX, newY) =>
-                    handlePositionChange(app.id, newX, newY)
-                  }
-                  onClose={() => handleClose(app.id)}
-                  onMinimize={() => handleMinimize(app.id)}
-                  onMaximize={() => handleMaximize(app.id)}
-                >
-                  <AppComponent />
-                </Window>
-              );
-            })}
+            {apps
+              .filter((app) => app.isOpen && !app.isMinimized) // Only show open and non-minimized apps
+              .sort((a, b) => a.lastActive - b.lastActive) // Sort by lastActive (oldest first)
+              .map((app) => {
+                const AppComponent = app.component;
+                return (
+                  <Window
+                    key={app.id}
+                    title={app.title}
+                    isOpen={app.isOpen}
+                    isMaximized={app.isMaximized}
+                    x={app.x}
+                    y={app.y}
+                    onPositionChange={(newX, newY) =>
+                      handlePositionChange(app.id, newX, newY)
+                    }
+                    onClose={() => handleClose(app.id)}
+                    onMinimize={() => handleMinimize(app.id)}
+                    onMaximize={() => handleMaximize(app.id)}
+                    style={{ zIndex: 1000 + app.lastActive }} // Dynamic z-index based on lastActive
+                  >
+                    <AppComponent />
+                  </Window>
+                );
+              })}
           </div>
           <Dock
             apps={apps}

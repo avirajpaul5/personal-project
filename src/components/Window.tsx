@@ -14,6 +14,7 @@ interface WindowProps {
   x: number;
   y: number;
   onPositionChange: (x: number, y: number) => void;
+  style?: React.CSSProperties;
 }
 
 export default function Window({
@@ -27,6 +28,7 @@ export default function Window({
   x,
   y,
   onPositionChange,
+  style,
 }: WindowProps) {
   const [size, setSize] = useState({ width: 600, height: 400 });
   const [isClosing, setIsClosing] = useState(false);
@@ -62,6 +64,21 @@ export default function Window({
     }, 400);
   };
 
+  const handleMaximize = () => {
+    if (!isMaximized) {
+      // Store the current size and position before maximizing
+      previousSize.current = size;
+      previousPosition.current = { x, y };
+      setSize({ width: window.innerWidth, height: window.innerHeight });
+      onPositionChange(0, 0); // Move to top-left corner
+    } else {
+      // Restore the previous size and position
+      setSize(previousSize.current);
+      onPositionChange(previousPosition.current.x, previousPosition.current.y);
+    }
+    onMaximize(); // Toggle the isMaximized state in the parent
+  };
+
   const handleDragStop = (_e: any, d: { x: number; y: number }) => {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
@@ -84,8 +101,13 @@ export default function Window({
         justifyContent: "center",
         zIndex: 1000,
         transition: "width 0.3s, height 0.3s, transform 0.3s",
+        ...style,
       }}
-      size={isMaximized ? { width: "100%", height: "100%" } : size}
+      size={
+        isMaximized
+          ? { width: window.innerWidth, height: window.innerHeight }
+          : size
+      }
       position={isMaximized ? { x: 0, y: 0 } : { x, y }}
       onDragStop={handleDragStop}
       onResize={(_e, _direction, ref, _delta, position) => {
@@ -125,7 +147,7 @@ export default function Window({
               <Minus size={10} className="text-white" />
             </button>
             <button
-              onClick={onMaximize}
+              onClick={handleMaximize}
               className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500 hover:bg-green-600 transition-colors"
             >
               <Maximize size={10} className="text-white" />

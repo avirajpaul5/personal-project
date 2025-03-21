@@ -8,4 +8,5 @@ export interface Window {
   component: React.ComponentType;
   x: number; // Add this
   y: number; // Add this
+  lastActive: number;
 }
