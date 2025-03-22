@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { Rnd } from "react-rnd";
-import { X, Minus, Maximize } from "lucide-react";
 import clsx from "clsx";
 
 interface WindowProps {
@@ -125,6 +124,7 @@ export default function Window({
       <div
         ref={windowRef}
         className={clsx(
+          "window-container",
           "flex flex-col bg-mac-window backdrop-blur-lg rounded-lg shadow-lg window-transition",
           "border border-mac-border w-full h-full overflow-hidden",
           isClosing ? "genie-exit" : "genie-enter",
@@ -137,21 +137,15 @@ export default function Window({
             <button
               onClick={handleClose}
               className="w-4 h-4 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 transition-colors"
-            >
-              <X size={10} className="text-white" />
-            </button>
+            ></button>
             <button
               onClick={handleMinimize}
               className="w-4 h-4 flex items-center justify-center rounded-full bg-yellow-500 hover:bg-yellow-600 transition-colors"
-            >
-              <Minus size={10} className="text-white" />
-            </button>
+            ></button>
             <button
               onClick={handleMaximize}
               className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500 hover:bg-green-600 transition-colors"
-            >
-              <Maximize size={10} className="text-white" />
-            </button>
+            ></button>
           </div>
           <span className="flex-1 text-center text-sm font-medium text-gray-700">
             {title}

@@ -9,6 +9,13 @@ import Contact from "./components/Contact";
 import MacOSPreloader from "./components/Preloader";
 import { motion } from "framer-motion";
 
+// You can customize these background images by replacing the URLs
+const BACKGROUNDS = {
+  light:
+    "url('https://images.unsplash.com/photo-1604147495798-57beb5d6af73?q=80&w=2000')",
+  dark: "url('https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=2000')",
+};
+
 const initialApps: WindowType[] = [
   {
     id: "home",
@@ -69,7 +76,7 @@ const initialApps: WindowType[] = [
 
 function App() {
   const [apps, setApps] = useState<WindowType[]>(initialApps);
-
+  const [isDark, setIsDark] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -79,6 +86,14 @@ function App() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDark]);
 
   const handleAppClick = (id: string) => {
     setApps((prevApps) =>
@@ -155,7 +170,14 @@ function App() {
   };
 
   return (
-    <div className="h-screen bg-black overflow-hidden">
+    <div
+      className="h-screen bg-black overflow-hidden"
+      style={{
+        backgroundImage: isDark ? BACKGROUNDS.dark : BACKGROUNDS.light,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       {loading ? (
         <MacOSPreloader onFinish={() => setLoading(false)} />
       ) : (
@@ -165,7 +187,7 @@ function App() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <Navbar />
+          <Navbar isDark={isDark} onThemeToggle={() => setIsDark(!isDark)} />{" "}
           <div className="relative w-full h-full pt-7">
             {apps
               .filter((app) => app.isOpen && !app.isMinimized) // Only show open and non-minimized apps
