@@ -7,6 +7,7 @@ import About from "./components/sections/About";
 import Projects from "./components/sections/Projects";
 import Contact from "./components/sections/Contact";
 import MacOSPreloader from "./components/common/Preloader";
+import SpotlightSearch from "./components/common/SpotlightSearch";
 import { motion } from "framer-motion";
 
 // You can customize these background images by replacing the URLs
@@ -78,6 +79,7 @@ function App() {
   const [apps, setApps] = useState<WindowType[]>(initialApps);
   const [isDark, setIsDark] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -94,6 +96,18 @@ function App() {
       document.documentElement.classList.remove("dark");
     }
   }, [isDark]);
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setIsSpotlightOpen(true);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   const handleAppClick = (id: string) => {
     setApps((prevApps) =>
@@ -187,7 +201,12 @@ function App() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <Navbar isDark={isDark} onThemeToggle={() => setIsDark(!isDark)} />{" "}
+          <Navbar isDark={isDark} onThemeToggle={() => setIsDark(!isDark)} />
+          <SpotlightSearch
+            isOpen={isSpotlightOpen}
+            onClose={() => setIsSpotlightOpen(false)}
+            onAppClick={handleAppClick}
+          />
           <div className="relative w-full h-full pt-7">
             {apps
               .filter((app) => app.isOpen && !app.isMinimized) // Only show open and non-minimized apps
