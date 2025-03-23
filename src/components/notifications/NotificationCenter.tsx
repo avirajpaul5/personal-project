@@ -6,7 +6,7 @@ import {
   WeatherWidget,
   MusicWidget,
   WorldClockWidget,
-} from "./Widgets";
+} from "../common/Widgets";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 
 interface NotificationCenterProps {

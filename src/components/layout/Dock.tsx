@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Window } from "../types";
+import { Window } from "../utils/types";
 
 interface DockProps {
   apps: Window[];

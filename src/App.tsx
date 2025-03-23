@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { Window as WindowType } from "./types";
-import Window from "./components/Window";
-import Dock from "./components/Dock";
-import Navbar from "./components/Navbar";
-import About from "./components/About";
-import Projects from "./components/Projects";
-import Contact from "./components/Contact";
-import MacOSPreloader from "./components/Preloader";
+import { Window as WindowType } from "./components/utils/types";
+import Window from "./components/layout/Window";
+import Dock from "./components/layout/Dock";
+import Navbar from "./components/layout/Navbar";
+import About from "./components/sections/About";
+import Projects from "./components/sections/Projects";
+import Contact from "./components/sections/Contact";
+import MacOSPreloader from "./components/common/Preloader";
 import { motion } from "framer-motion";
 
 // You can customize these background images by replacing the URLs

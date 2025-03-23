@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import ThemeToggle from "./ThemeToggle";
-import NotificationCenter from "./NotificationCenter";
+import ThemeToggle from "../common/ThemeToggle";
+import NotificationCenter from "../notifications/NotificationCenter";
 
 export default function Navbar({
   isDark,
