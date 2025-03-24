@@ -65,17 +65,18 @@ export default function Window({
 
   const handleMaximize = () => {
     if (!isMaximized) {
-      // Store the current size and position before maximizing
       previousSize.current = size;
       previousPosition.current = { x, y };
-      setSize({ width: window.innerWidth, height: window.innerHeight });
-      onPositionChange(0, 0); // Move to top-left corner
+      setSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+      onPositionChange(0, 0);
     } else {
-      // Restore the previous size and position
       setSize(previousSize.current);
       onPositionChange(previousPosition.current.x, previousPosition.current.y);
     }
-    onMaximize(); // Toggle the isMaximized state in the parent
+    onMaximize();
   };
 
   const handleDragStop = (_e: any, d: { x: number; y: number }) => {
@@ -98,7 +99,6 @@ export default function Window({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 1000,
         transition: "width 0.3s, height 0.3s, transform 0.3s",
         ...style,
       }}

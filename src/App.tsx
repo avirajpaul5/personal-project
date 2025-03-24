@@ -169,9 +169,27 @@ function App() {
 
   const handleMaximize = (id: string) => {
     setApps((prevApps) =>
-      prevApps.map((app) =>
-        app.id === id ? { ...app, isMaximized: !app.isMaximized } : app
-      )
+      prevApps.map((app) => {
+        if (app.id === id) {
+          // Bring window to front when maximizing
+          const isMaximizing = !app.isMaximized;
+          return {
+            ...app,
+            isMaximized: !app.isMaximized,
+            lastActive: Date.now(),
+            // Store original position/size only when maximizing
+            ...(isMaximizing
+              ? {
+                  x: app.x,
+                  y: app.y,
+                  width: 600,
+                  height: 400,
+                }
+              : {}),
+          };
+        }
+        return app;
+      })
     );
   };
 
