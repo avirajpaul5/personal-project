@@ -160,6 +160,14 @@ function App() {
     );
   };
 
+  const handleCloseApp = (id: string) => {
+    setApps((prevApps) =>
+      prevApps.map((app) =>
+        app.id === id ? { ...app, isOpen: false, isMinimized: false } : app
+      )
+    );
+  };
+
   const handleMinimize = (id: string) => {
     setApps((prevApps) =>
       prevApps.map((app) =>
@@ -264,6 +272,7 @@ function App() {
             onAppClick={handleAppClick}
             onMinimizeApp={onMinimizeApp}
             onRestoreApp={onRestoreApp}
+            onCloseApp={handleCloseApp}
           />
         </motion.div>
       )}

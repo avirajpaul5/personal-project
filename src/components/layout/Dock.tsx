@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Window } from "../utils/types";
 import clsx from "clsx";
+import { X } from "lucide-react";
 
 interface DockProps {
   apps: Window[];
@@ -8,6 +9,7 @@ interface DockProps {
   onAppClick: (id: string) => void;
   onMinimizeApp: (id: string) => void;
   onRestoreApp: (id: string) => void;
+  onCloseApp: (id: string) => void;
 }
 
 export default function Dock({
@@ -16,7 +18,11 @@ export default function Dock({
   onAppClick,
   onMinimizeApp,
   onRestoreApp,
+  onCloseApp,
 }: DockProps) {
+  const [hoveredMinimizedApp, setHoveredMinimizedApp] = useState<string | null>(
+    null
+  );
   const [hoveredApp, setHoveredApp] = useState<string | null>(null);
   const minimizedApps = apps.filter((app) => app.isMinimized);
 
@@ -77,7 +83,7 @@ export default function Dock({
           ))}
       </div>
 
-      {/* Divider */}
+      {/* Divider - only show if there are minimized apps */}
       {minimizedApps.length > 0 && (
         <div
           className={clsx(
@@ -91,22 +97,45 @@ export default function Dock({
       {minimizedApps.length > 0 && (
         <div className="flex items-center space-x-2">
           {minimizedApps.map((app) => (
-            <button
+            <div
               key={app.id}
-              onClick={() => onRestoreApp(app.id)}
-              className={clsx(
-                "p-2 rounded-xl transition",
-                isDark
-                  ? "bg-gray-700 hover:bg-gray-600"
-                  : "bg-gray-200 hover:bg-gray-300"
-              )}
+              className="relative group"
+              onMouseEnter={() => setHoveredMinimizedApp(app.id)}
+              onMouseLeave={() => setHoveredMinimizedApp(null)}
             >
-              <img
-                src={app.icon}
-                alt={app.title}
-                className="w-10 h-10 opacity-70"
-              />
-            </button>
+              <button
+                onClick={() => onRestoreApp(app.id)}
+                className={clsx(
+                  "p-2 rounded-xl transition relative",
+                  isDark
+                    ? "bg-gray-700 hover:bg-gray-600"
+                    : "bg-gray-200 hover:bg-gray-300"
+                )}
+              >
+                <img
+                  src={app.icon}
+                  alt={app.title}
+                  className="w-10 h-10 opacity-70"
+                />
+                {/* Close button that only appears for minimized apps on hover */}
+                {hoveredMinimizedApp === app.id && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCloseApp(app.id);
+                    }}
+                    className={clsx(
+                      "absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center p-0.5",
+                      isDark
+                        ? "bg-red-500 hover:bg-red-400 text-gray-200"
+                        : "bg-red-500 hover:bg-red-600 text-white"
+                    )}
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </button>
+            </div>
           ))}
         </div>
       )}
