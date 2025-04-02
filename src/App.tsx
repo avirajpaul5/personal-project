@@ -86,7 +86,7 @@ const initialApps: WindowType[] = [
     x: 100,
     y: 100,
     lastActive: 0,
-    component: () => null, // We'll render Terminal separately
+    component: () => null, 
   },
 ];
 
@@ -99,7 +99,7 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 3800); // Simulate a 2-second loading time
+    }, 3800); 
 
     return () => clearTimeout(timer);
   }, []);
@@ -161,7 +161,7 @@ function App() {
               ...app,
               isMinimized: false,
               isOpen: true,
-              lastActive: Date.now(), // Update activation time
+              lastActive: Date.now(), 
             }
           : app
       )

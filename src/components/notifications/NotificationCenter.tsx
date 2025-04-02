@@ -1,12 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import { useRef, useEffect } from "react";
-import {
-  QuoteWidget,
-  WeatherWidget,
-  MusicWidget,
-  WorldClockWidget,
-} from "../common/Widgets";
+import { WeatherWidget, WorldClockWidget } from "../common/Widgets";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 
 interface NotificationCenterProps {
@@ -44,6 +39,8 @@ export default function NotificationCenter({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, onClose]);
 
+  const playlistId = "3rE6ZLp7YXOhSIFSfv4LUM";
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -76,8 +73,17 @@ export default function NotificationCenter({
             <div className="space-y-4">
               <WorldClockWidget />
               <WeatherWidget />
-              <MusicWidget />
-              <QuoteWidget />
+                <div style={{ height: "360px" }}>
+                  <iframe
+                    title="Spotify Embed: Recommendation Playlist"
+                    src={`https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0`}
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                  />
+                </div>
             </div>
           </div>
         </motion.div>
