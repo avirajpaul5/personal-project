@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import ThemeToggle from "../common/ThemeToggle";
 import NotificationCenter from "../notifications/NotificationCenter";
+import clsx from "clsx";
 
 export default function Navbar({
   isDark,
@@ -34,13 +35,21 @@ export default function Navbar({
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-7 bg-black/20 dark:bg-white/10 backdrop-blur-xl flex items-center justify-between px-4 text-white text-sm z-50 app-navbar">
+    <div
+      className={clsx(
+        "fixed top-0 left-0 right-0 h-7 backdrop-blur-xl flex items-center justify-between px-4 text-sm z-50 app-navbar transition-colors duration-300",
+        isDark ? "bg-gray-900/30 text-gray-300" : "bg-white/30 text-gray-900"
+      )}
+    >
       <div className="font-semibold">Aviraj Paul</div>
       <div className="flex items-center space-x-4">
         <ThemeToggle isDark={isDark} onToggle={onThemeToggle} />
         <button
           onClick={() => setIsNotificationCenterOpen(true)}
-          className="hover:bg-gray-200/50 dark:hover:bg-gray-800/50 px-2 py-0.5 rounded"
+          className={clsx(
+            "hover:bg-opacity-20 px-2 py-0.5 rounded transition-colors",
+            isDark ? "hover:bg-white" : "hover:bg-black"
+          )}
         >
           {formatDate(currentTime)}
         </button>{" "}
@@ -48,6 +57,7 @@ export default function Navbar({
       <NotificationCenter
         isOpen={isNotificationCenterOpen}
         onClose={() => setIsNotificationCenterOpen(false)}
+        isDark={isDark}
       />
     </div>
   );

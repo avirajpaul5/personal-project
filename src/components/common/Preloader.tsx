@@ -48,7 +48,7 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
     <AnimatePresence>
       {loading && (
         <motion.div
-          className="fixed inset-0 flex flex-col items-center justify-center bg-white dark:bg-black z-50"
+          className="fixed inset-0 flex flex-col items-center justify-center bg-white dark:bg-gray-900 z-50"
           exit={{
             opacity: 0,
             transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
@@ -65,7 +65,8 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
                 cx="20"
                 cy="20"
                 r="18"
-                stroke="#E5E5E5"
+                stroke="currentColor"
+                className="text-gray-200 dark:text-gray-700"
                 strokeWidth="2"
                 fill="none"
               />
@@ -73,7 +74,8 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
                 cx="20"
                 cy="20"
                 r="18"
-                stroke="#007AFF"
+                stroke="currentColor"
+                className="text-blue-500 dark:text-blue-400"
                 strokeWidth="3"
                 strokeLinecap="round"
                 fill="none"
@@ -86,15 +88,15 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
           </motion.div>
 
           {/* Progress Bar */}
-          <div className="w-64 h-1 bg-gray-100 dark:bg-gray-600 rounded-full overflow-hidden">
+          <div className="w-64 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              className="h-full rounded-full bg-gray-900 dark:bg-gray-200"
+              className="h-full rounded-full bg-gray-800 dark:bg-gray-100"
               transition={{ ease: "easeOut", duration: 0.5 }}
             />
           </div>
-          <motion.p className="mt-2 text-xs text-gray-500 dark:text-gray-400 font-mono">
+          <motion.p className="mt-2 text-xs text-gray-500 dark:text-gray-300 font-mono">
             {Math.round(progress)}%
           </motion.p>
 
@@ -105,10 +107,10 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            <h1 className="text-gray-900 dark:text-white font-medium text-2xl">
+            <h1 className="text-gray-900 dark:text-gray-100 font-medium text-2xl">
               {greeting}
             </h1>
-            <p className="text-gray-500 dark:text-gray-400 text-base">{quip}</p>
+            <p className="text-gray-600 dark:text-gray-300 text-base">{quip}</p>
           </motion.div>
         </motion.div>
       )}

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Window } from "../utils/types";
+import clsx from "clsx";
 
 interface DockProps {
   apps: Window[];
+  isDark: boolean;
   onAppClick: (id: string) => void;
   onMinimizeApp: (id: string) => void;
   onRestoreApp: (id: string) => void;
@@ -10,6 +12,7 @@ interface DockProps {
 
 export default function Dock({
   apps,
+  isDark,
   onAppClick,
   onMinimizeApp,
   onRestoreApp,
@@ -18,7 +21,14 @@ export default function Dock({
   const minimizedApps = apps.filter((app) => app.isMinimized);
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center bg-white/20 backdrop-blur-xl rounded-2xl shadow-lg px-4 py-2">
+    <div
+      className={clsx(
+        "fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center backdrop-blur-xl rounded-2xl shadow-lg px-4 py-2 transition-colors duration-300",
+        isDark
+          ? "bg-gray-900/30 border border-gray-700/50"
+          : "bg-white/30 border border-gray-300/50"
+      )}
+    >
       {/* Open Apps Section */}
       <div className="flex items-center space-x-2">
         {apps
@@ -31,28 +41,50 @@ export default function Dock({
                 }
                 onMouseEnter={() => setHoveredApp(app.id)}
                 onMouseLeave={() => setHoveredApp(null)}
-                className={`
-            relative transition-all duration-200 ease-in-out p-2 rounded-xl
-            hover:bg-white/10
-            ${hoveredApp === app.id ? "scale-125" : "scale-100"}
-          `}
+                className={clsx(
+                  "relative transition-all duration-200 ease-in-out p-2 rounded-xl",
+                  isDark ? "hover:bg-white/10" : "hover:bg-black/10",
+                  hoveredApp === app.id ? "scale-125" : "scale-100"
+                )}
               >
                 <img src={app.icon} alt={app.title} className="w-10 h-10" />
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 bg-black/80 text-white text-xs rounded-md whitespace-nowrap">
+                <div
+                  className={clsx(
+                    "absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs rounded-md whitespace-nowrap",
+                    isDark
+                      ? "bg-gray-800 text-gray-200"
+                      : "bg-gray-100 text-gray-900"
+                  )}
+                >
                   {app.title}
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-black/80 transform rotate-45 -mb-1"></div>
+                  <div
+                    className={clsx(
+                      "absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 transform rotate-45 -mb-1",
+                      isDark ? "bg-gray-800" : "bg-gray-100"
+                    )}
+                  ></div>
                 </div>
               </button>
               {app.isOpen && !app.isMinimized && (
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white" />
+                <div
+                  className={clsx(
+                    "absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full",
+                    isDark ? "bg-gray-200" : "bg-gray-600"
+                  )}
+                />
               )}
             </div>
           ))}
       </div>
 
-      {/* Divider to Separate Open and Minimized Apps */}
+      {/* Divider */}
       {minimizedApps.length > 0 && (
-        <div className="w-px h-10 bg-gray-400 mx-4" />
+        <div
+          className={clsx(
+            "w-px h-10 mx-4",
+            isDark ? "bg-gray-600" : "bg-gray-300"
+          )}
+        />
       )}
 
       {/* Minimized Apps Section */}
@@ -62,7 +94,12 @@ export default function Dock({
             <button
               key={app.id}
               onClick={() => onRestoreApp(app.id)}
-              className="p-2 rounded-xl bg-gray-300 hover:bg-gray-400 transition"
+              className={clsx(
+                "p-2 rounded-xl transition",
+                isDark
+                  ? "bg-gray-700 hover:bg-gray-600"
+                  : "bg-gray-200 hover:bg-gray-300"
+              )}
             >
               <img
                 src={app.icon}

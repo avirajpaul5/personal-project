@@ -14,6 +14,7 @@ interface WindowProps {
   y: number;
   onPositionChange: (x: number, y: number) => void;
   style?: React.CSSProperties;
+  isDark: boolean;
 }
 
 export default function Window({
@@ -28,6 +29,7 @@ export default function Window({
   y,
   onPositionChange,
   style,
+  isDark,
 }: WindowProps) {
   const [size, setSize] = useState({ width: 600, height: 400 });
   const [isClosing, setIsClosing] = useState(false);
@@ -125,29 +127,59 @@ export default function Window({
         ref={windowRef}
         className={clsx(
           "window-container",
-          "flex flex-col bg-mac-window backdrop-blur-lg rounded-lg shadow-lg window-transition",
-          "border border-mac-border w-full h-full overflow-hidden",
+          "flex flex-col backdrop-blur-lg rounded-lg shadow-lg window-transition",
+          "border w-full h-full overflow-hidden",
           isClosing ? "genie-exit" : "genie-enter",
           isMinimizing && "window-minimized",
-          isMaximized && "window-maximized"
+          isMaximized && "window-maximized",
+          isDark
+            ? "bg-gray-800/90 border-gray-600"
+            : "bg-white/90 border-gray-200"
         )}
       >
-        <div className="window-handle flex items-center p-2 bg-gray-100 border-b border-mac-border">
+        <div
+          className={clsx(
+            "window-handle flex items-center p-2 border-b",
+            isDark
+              ? "bg-gray-700 border-gray-600"
+              : "bg-gray-100 border-gray-200"
+          )}
+        >
           <div className="flex space-x-2">
             <button
               onClick={handleClose}
-              className="w-4 h-4 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 transition-colors"
+              className={clsx(
+                "w-4 h-4 flex items-center justify-center rounded-full transition-colors",
+                isDark
+                  ? "bg-red-500 hover:bg-red-400"
+                  : "bg-red-500 hover:bg-red-600"
+              )}
             ></button>
             <button
               onClick={handleMinimize}
-              className="w-4 h-4 flex items-center justify-center rounded-full bg-yellow-500 hover:bg-yellow-600 transition-colors"
+              className={clsx(
+                "w-4 h-4 flex items-center justify-center rounded-full transition-colors",
+                isDark
+                  ? "bg-yellow-500 hover:bg-yellow-400"
+                  : "bg-yellow-500 hover:bg-yellow-600"
+              )}
             ></button>
             <button
               onClick={handleMaximize}
-              className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500 hover:bg-green-600 transition-colors"
+              className={clsx(
+                "w-4 h-4 flex items-center justify-center rounded-full transition-colors",
+                isDark
+                  ? "bg-green-500 hover:bg-green-400"
+                  : "bg-green-500 hover:bg-green-600"
+              )}
             ></button>
           </div>
-          <span className="flex-1 text-center text-sm font-medium text-gray-700">
+          <span
+            className={clsx(
+              "flex-1 text-center text-sm font-medium",
+              isDark ? "text-gray-200" : "text-gray-700"
+            )}
+          >
             {title}
           </span>
         </div>

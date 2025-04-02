@@ -9,6 +9,7 @@ import Contact from "./components/sections/Contact";
 import MacOSPreloader from "./components/common/Preloader";
 import SpotlightSearch from "./components/common/SpotlightSearch";
 import { motion } from "framer-motion";
+import clsx from "clsx";
 
 // You can customize these background images by replacing the URLs
 const BACKGROUNDS = {
@@ -29,9 +30,9 @@ const initialApps: WindowType[] = [
     y: 100,
     lastActive: 0,
     component: () => (
-      <div className="text-center p-8">
+      <div className="text-center p-8 dark:text-white">
         <h1 className="text-4xl font-bold mb-4">Portfolio OS</h1>
-        <p className="text-xl text-gray-600">
+        <p className="text-xl text-gray-600 dark:text-gray-300">
           Click on an app in the dock to explore my portfolio
         </p>
       </div>
@@ -203,7 +204,10 @@ function App() {
 
   return (
     <div
-      className="h-screen bg-black overflow-hidden"
+      className={clsx(
+        "h-screen overflow-hidden transition-colors duration-300",
+        isDark ? "dark" : "light"
+      )}
       style={{
         backgroundImage: isDark ? BACKGROUNDS.dark : BACKGROUNDS.light,
         backgroundSize: "cover",
@@ -224,6 +228,7 @@ function App() {
             isOpen={isSpotlightOpen}
             onClose={() => setIsSpotlightOpen(false)}
             onAppClick={handleAppClick}
+            isDark={isDark}
           />
           <div className="relative w-full h-full pt-7">
             {apps
@@ -234,6 +239,7 @@ function App() {
                 return (
                   <Window
                     key={app.id}
+                    isDark={isDark}
                     title={app.title}
                     isOpen={app.isOpen}
                     isMaximized={app.isMaximized}
@@ -254,6 +260,7 @@ function App() {
           </div>
           <Dock
             apps={apps}
+            isDark={isDark}
             onAppClick={handleAppClick}
             onMinimizeApp={onMinimizeApp}
             onRestoreApp={onRestoreApp}

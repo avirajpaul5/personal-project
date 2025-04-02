@@ -11,6 +11,7 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 
 interface NotificationCenterProps {
   isOpen: boolean;
+  isDark: boolean;
   onClose: () => void;
 }
 
