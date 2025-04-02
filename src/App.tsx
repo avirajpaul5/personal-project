@@ -8,6 +8,7 @@ import Projects from "./components/sections/Projects";
 import Contact from "./components/sections/Contact";
 import MacOSPreloader from "./components/common/Preloader";
 import SpotlightSearch from "./components/common/SpotlightSearch";
+import Terminal from "./components/sections/Terminal";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 
@@ -18,6 +19,7 @@ const BACKGROUNDS = {
   dark: "url('https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=2000')",
 };
 
+// Define initialApps outside the component but without terminal commands
 const initialApps: WindowType[] = [
   {
     id: "home",
@@ -73,6 +75,18 @@ const initialApps: WindowType[] = [
     y: 100,
     lastActive: 0,
     component: Contact,
+  },
+  {
+    id: "terminal",
+    title: "Terminal",
+    icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTIwIDRINGMtMS4xIDAtMS45OS45LTEuOTkgMkwyIDE4YzAgMS4xLjkgMiAyIDJoMTZjMS4xIDAgMi0uOSAyLTJWNmMwLTEuMS0uOS0yLTItMnptLTIgMTRINnYtMmgxMnYyem0wLTRINnYtMmgxMnYyem0wLTRINlY4aDEydjJ6Ii8+PC9zdmc+",
+    isOpen: false,
+    isMaximized: false,
+    isMinimized: false,
+    x: 100,
+    y: 100,
+    lastActive: 0,
+    component: () => null, // We'll render Terminal separately
   },
 ];
 
@@ -210,6 +224,23 @@ function App() {
     );
   };
 
+  // Function to process terminal commands
+  const processTerminalCommand = (command: string): string => {
+    switch (command) {
+      case "whoami":
+        return "A passionate developer who loves creating beautiful interfaces";
+      case "ls projects":
+        return "Project 1\nProject 2\nProject 3";
+      case "open contact":
+        handleAppClick("contact");
+        return "Opening contact...";
+      case "help":
+        return "Available commands:\nwhoami - About me\nls projects - List projects\nopen contact - Open contact window";
+      default:
+        return `Command not found: ${command}`;
+    }
+  };
+
   return (
     <div
       className={clsx(
@@ -243,6 +274,31 @@ function App() {
               .filter((app) => app.isOpen && !app.isMinimized) // Only show open and non-minimized apps
               .sort((a, b) => a.lastActive - b.lastActive) // Sort by lastActive (oldest first)
               .map((app) => {
+                // Special handling for terminal
+                if (app.id === "terminal") {
+                  return (
+                    <Window
+                      key={app.id}
+                      isDark={isDark}
+                      title={app.title}
+                      isOpen={app.isOpen}
+                      isMaximized={app.isMaximized}
+                      x={app.x}
+                      y={app.y}
+                      onPositionChange={(newX, newY) =>
+                        handlePositionChange(app.id, newX, newY)
+                      }
+                      onClose={() => handleClose(app.id)}
+                      onMinimize={() => handleMinimize(app.id)}
+                      onMaximize={() => handleMaximize(app.id)}
+                      style={{ zIndex: 1000 + app.lastActive }}
+                    >
+                      <Terminal onCommand={processTerminalCommand} />
+                    </Window>
+                  );
+                }
+
+                // For other apps
                 const AppComponent = app.component;
                 return (
                   <Window
@@ -259,7 +315,7 @@ function App() {
                     onClose={() => handleClose(app.id)}
                     onMinimize={() => handleMinimize(app.id)}
                     onMaximize={() => handleMaximize(app.id)}
-                    style={{ zIndex: 1000 + app.lastActive }} // Dynamic z-index based on lastActive
+                    style={{ zIndex: 1000 + app.lastActive }}
                   >
                     <AppComponent />
                   </Window>
