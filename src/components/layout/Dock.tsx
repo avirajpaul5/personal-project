@@ -75,7 +75,7 @@ export default function Dock({
 
         {/* Minimized Apps Section */}
         {minimizedApps.length > 0 && (
-          <div className="flex items-end space-x-2">
+          <div className="flex items-end space-x-6">
             {minimizedApps.map((app) => (
               <MinimizedDockIcon
                 key={app.id}

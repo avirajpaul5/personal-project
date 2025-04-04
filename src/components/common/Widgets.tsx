@@ -2,11 +2,15 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns-tz";
 import { AlertTriangle } from "lucide-react";
+import { toZonedTime } from "date-fns-tz";
 
 export function WorldClockWidget() {
   const [time, setTime] = useState(new Date());
   const cities = [
-    { name: "Local", timezone: undefined },
+    {
+      name: "Local",
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    },
     { name: "New York", timezone: "America/New_York" },
     { name: "London", timezone: "Europe/London" },
     { name: "Tokyo", timezone: "Asia/Tokyo" },
@@ -17,21 +21,29 @@ export function WorldClockWidget() {
     return () => clearInterval(timer);
   }, []);
 
+  const formatTime = (date: Date, timeZone: string) => {
+    try {
+      const zonedDate = toZonedTime(date, timeZone);
+      return format(zonedDate, "HH:mm", { timeZone });
+    } catch (error) {
+      console.error("Error formatting time:", error);
+      return "??:??";
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="bg-white/50 dark:bg-gray-800/50 rounded-xl p-4 shadow-lg"
     >
-      <h3 className="font-bold mb-3">World Clock</h3>
+      <h3 className="font-bold mb-3 dark:text-gray-100">World Clock</h3>
       <div className="grid grid-cols-2 gap-3">
         {cities.map((city) => (
           <div key={city.name} className="text-sm">
-            <div className="font-medium">{city.name}</div>
-            <div className="text-gray-600 dark:text-gray-300">
-              {format(time, "HH:mm", {
-                timeZone: city.timezone,
-              })}
+            <div className="font-medium dark:text-gray-300">{city.name}</div>
+            <div className="text-gray-600 dark:text-gray-400">
+              {formatTime(time, city.timezone)}
             </div>
           </div>
         ))}
@@ -232,4 +244,3 @@ function LocationPermissionModal({
     </AnimatePresence>
   );
 }
-
