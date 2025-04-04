@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { useRef, useEffect } from "react";
 import { WeatherWidget, WorldClockWidget } from "../common/Widgets";
@@ -18,7 +18,6 @@ export default function NotificationCenter({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Get all interactive elements that should keep notification center open
       const navbar = document.querySelector(".app-navbar");
       const windows = document.querySelectorAll(".window-container");
 
@@ -42,52 +41,48 @@ export default function NotificationCenter({
   const playlistId = "3rE6ZLp7YXOhSIFSfv4LUM";
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          ref={panelRef}
-          initial={{ opacity: 0, x: 400 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 400 }}
-          transition={{
-            type: "spring",
-            damping: 20,
-            stiffness: 200,
-            restDelta: 0.1,
-          }}
-          className="fixed right-0 top-0 h-screen w-96 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl z-[60] overflow-y-auto"
-        >
-          <div className="pt-12 p-4">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold">
-                {format(new Date(), "EEEE, MMMM d")}
-              </h2>
-              <button
-                onClick={onClose}
-                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full"
-              >
-                <XMarkIcon className="w-5 h-5" />
-              </button>
-            </div>
+    <motion.div
+      ref={panelRef}
+      initial={{ opacity: 0, x: 400 }}
+      animate={{ opacity: isOpen ? 1 : 0, x: isOpen ? 0 : 400 }}
+      transition={{
+        type: "spring",
+        damping: 20,
+        stiffness: 200,
+        restDelta: 0.1,
+      }}
+      style={{ pointerEvents: isOpen ? "auto" : "none" }}
+      className="fixed right-0 top-0 h-screen w-96 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl z-[60] overflow-y-auto"
+    >
+      <div className="pt-12 p-4">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold">
+            {format(new Date(), "EEEE, MMMM d")}
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full"
+          >
+            <XMarkIcon className="w-5 h-5" />
+          </button>
+        </div>
 
-            <div className="space-y-4">
-              <WorldClockWidget />
-              <WeatherWidget />
-              <div style={{ height: "360px" }}>
-                <iframe
-                  title="Spotify Embed: Recommendation Playlist"
-                  src={`https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0`}
-                  width="100%"
-                  height="100%"
-                  frameBorder="0"
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  loading="lazy"
-                />
-              </div>
-            </div>
+        <div className="space-y-4">
+          <WorldClockWidget />
+          <WeatherWidget />
+          <div style={{ height: "360px" }}>
+            <iframe
+              title="Spotify Embed: Recommendation Playlist"
+              src={`https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0`}
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+            />
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </div>
+      </div>
+    </motion.div>
   );
 }
