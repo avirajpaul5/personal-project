@@ -73,17 +73,17 @@ export default function NotificationCenter({
             <div className="space-y-4">
               <WorldClockWidget />
               <WeatherWidget />
-                <div style={{ height: "360px" }}>
-                  <iframe
-                    title="Spotify Embed: Recommendation Playlist"
-                    src={`https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0`}
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                    loading="lazy"
-                  />
-                </div>
+              <div style={{ height: "360px" }}>
+                <iframe
+                  title="Spotify Embed: Recommendation Playlist"
+                  src={`https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0`}
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                />
+              </div>
             </div>
           </div>
         </motion.div>
