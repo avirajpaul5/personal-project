@@ -86,7 +86,7 @@ const initialApps: WindowType[] = [
     x: 100,
     y: 100,
     lastActive: 0,
-    component: () => null, 
+    component: () => null,
   },
 ];
 
@@ -100,7 +100,7 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 3800); 
+    }, 3800);
 
     return () => clearTimeout(timer);
   }, []);
@@ -114,7 +114,7 @@ function App() {
     }
   }, [isDark]);
 
-  //Spotlight 
+  //Spotlight
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -164,7 +164,7 @@ function App() {
               ...app,
               isMinimized: false,
               isOpen: true,
-              lastActive: Date.now(), 
+              lastActive: Date.now(),
             }
           : app
       )
@@ -188,7 +188,7 @@ function App() {
   const handleMinimize = (id: string) => {
     setApps((prevApps) =>
       prevApps.map((app) =>
-        app.id === id ? { ...app, isMinimized: true, isOpen: false } : app
+        app.id === id ? { ...app, isMinimized: true } : app
       )
     );
   };
@@ -284,7 +284,7 @@ function App() {
                       key={app.id}
                       isDark={isDark}
                       title={app.title}
-                      isOpen={app.isOpen}
+                      isOpen={app.isOpen && !app.isMinimized}
                       isMaximized={app.isMaximized}
                       x={app.x}
                       y={app.y}

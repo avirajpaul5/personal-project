@@ -33,37 +33,26 @@ export default function Window({
   isDark,
 }: WindowProps) {
   const [size, setSize] = useState({ width: 600, height: 400 });
-  const [isClosing, setIsClosing] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [isMinimizing, setIsMinimizing] = useState(false);
   const windowRef = useRef<HTMLDivElement>(null);
   const previousSize = useRef({ width: 600, height: 400 });
   const previousPosition = useRef({ x: 100, y: 100 });
+  const [exitType, setExitType] = useState<"close" | "minimize">("close");
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (isOpen && !isClosing) {
+    if (isOpen) {
       setIsVisible(true);
-      setIsClosing(false);
-      setIsMinimizing(false);
     }
-  }, [isOpen, isClosing]);
+  }, [isOpen]);
 
   const handleClose = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-      setIsClosing(false);
-      setIsVisible(false);
-    }, 400); // Match this duration with your CSS transition
+    setExitType("close");
+    setIsVisible(false);
   };
 
   const handleMinimize = () => {
-    setIsMinimizing(true);
-    setTimeout(() => {
-      setIsVisible(false);
-      setIsMinimizing(false);
-      onMinimize();
-    }, 400);
+    setExitType("minimize");
+    setIsVisible(false);
   };
 
   const handleMaximize = () => {
@@ -86,26 +75,57 @@ export default function Window({
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
-    // Add smooth boundaries with 20px margin
     const newX = Math.max(20, Math.min(d.x, windowWidth - size.width - 20));
     const newY = Math.max(20, Math.min(d.y, windowHeight - size.height - 20));
 
     onPositionChange(newX, newY);
   };
 
-  if (!isOpen && !isClosing && !isVisible) return null;
+  const exitVariants = {
+    close: {
+      opacity: 0,
+      scale: 0.95,
+      transition: { duration: 0.3 },
+    },
+    minimize: {
+      y: 100,
+      scale: 0.8,
+      opacity: 0.5,
+      filter: "blur(4px)",
+      transition: {
+        duration: 0.4,
+        ease: [0.68, -0.55, 0.27, 1.55],
+      },
+    },
+  };
 
   return (
-    <AnimatePresence>
+    <AnimatePresence
+      onExitComplete={() => {
+        if (exitType === "close") onClose();
+        if (exitType === "minimize") onMinimize();
+      }}
+    >
       {isVisible && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.2, ease: "easeInOut" }}
+          animate={{
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            filter: "blur(0px)",
+          }}
+          exit={exitVariants[exitType]}
+          transition={{
+            type: "spring",
+            damping: 20,
+            stiffness: 200,
+          }}
           style={{
             position: "fixed",
             zIndex: style?.zIndex || 1000,
+            originX: 0.5,
+            originY: 0.5,
           }}
         >
           <Rnd
@@ -113,8 +133,6 @@ export default function Window({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              transition: "transform 0.2s cubic-bezier(0.22, 1, 0.36, 1)",
-              willChange: "transform",
               ...style,
             }}
             size={
@@ -139,12 +157,8 @@ export default function Window({
             <div
               ref={windowRef}
               className={clsx(
-                "window-container",
-                "flex flex-col backdrop-blur-lg rounded-lg shadow-lg window-transition",
+                "flex flex-col backdrop-blur-lg rounded-lg shadow-lg",
                 "border w-full h-full overflow-hidden",
-                isClosing ? "window-closing" : "window-open",
-                isMinimizing && "window-minimized",
-                isMaximized && "window-maximized",
                 isDark
                   ? "bg-gray-800/90 border-gray-600"
                   : "bg-white/90 border-gray-200"
@@ -162,30 +176,30 @@ export default function Window({
                   <button
                     onClick={handleClose}
                     className={clsx(
-                      "w-4 h-4 flex items-center justify-center rounded-full transition-colors",
+                      "w-4 h-4 rounded-full transition-colors",
                       isDark
                         ? "bg-red-500 hover:bg-red-400"
                         : "bg-red-500 hover:bg-red-600"
                     )}
-                  ></button>
+                  />
                   <button
                     onClick={handleMinimize}
                     className={clsx(
-                      "w-4 h-4 flex items-center justify-center rounded-full transition-colors",
+                      "w-4 h-4 rounded-full transition-colors",
                       isDark
                         ? "bg-yellow-500 hover:bg-yellow-400"
                         : "bg-yellow-500 hover:bg-yellow-600"
                     )}
-                  ></button>
+                  />
                   <button
                     onClick={handleMaximize}
                     className={clsx(
-                      "w-4 h-4 flex items-center justify-center rounded-full transition-colors",
+                      "w-4 h-4 rounded-full transition-colors",
                       isDark
                         ? "bg-green-500 hover:bg-green-400"
                         : "bg-green-500 hover:bg-green-600"
                     )}
-                  ></button>
+                  />
                 </div>
                 <span
                   className={clsx(
