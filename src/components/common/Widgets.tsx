@@ -65,24 +65,16 @@ export function WeatherWidget() {
 
   const checkLocationPermission = async () => {
     try {
-      if (!navigator.permissions) {
-        setShowLocationModal(true);
-        return;
-      }
-
       const permission = await navigator.permissions.query({
         name: "geolocation",
       });
 
       if (permission.state === "granted") {
-        await getWeatherData();
+        getWeatherData();
       } else if (permission.state === "prompt") {
         setShowLocationModal(true);
-      } else if (permission.state === "denied") {
-        setShowLocationModal(true);
       }
-    } catch (error) {
-      console.error("Permission check failed:", error);
+    } catch {
       setShowLocationModal(true);
     }
   };
