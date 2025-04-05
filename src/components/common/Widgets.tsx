@@ -79,20 +79,18 @@ export function WeatherWidget() {
     }
   };
 
+  const getCurrentPosition = (): Promise<GeolocationPosition> =>
+    new Promise((resolve, reject) =>
+      navigator.geolocation.getCurrentPosition(resolve, reject)
+    );
+
   const getWeatherData = async (lat?: number, lon?: number) => {
+    setLoading(true);
     try {
       if (!lat || !lon) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            getWeatherData(position.coords.latitude, position.coords.longitude);
-          },
-          (error) => {
-            setLocationError("Location access denied");
-            setShowLocationModal(false);
-            setLoading(false);
-          }
-        );
-        return;
+        const position = await getCurrentPosition();
+        lat = position.coords.latitude;
+        lon = position.coords.longitude;
       }
 
       const response = await fetch(
@@ -100,7 +98,12 @@ export function WeatherWidget() {
           import.meta.env.VITE_OWM_KEY
         }&units=metric`
       );
+
       const data = await response.json();
+
+      if (!data.weather || !data.weather.length) {
+        throw new Error("Malformed weather data");
+      }
 
       setWeather({
         temp: Math.round(data.main.temp),
@@ -109,7 +112,17 @@ export function WeatherWidget() {
       });
       setError("");
     } catch (err) {
-      setError("Failed to fetch weather data");
+      console.error("Error fetching weather:", err);
+
+      if (err instanceof GeolocationPositionError) {
+        if (err.code === 1) {
+          setLocationError("Location access denied");
+        }
+      } else {
+        setError("Failed to fetch weather data");
+      }
+
+      setShowLocationModal(true);
     } finally {
       setLoading(false);
     }
