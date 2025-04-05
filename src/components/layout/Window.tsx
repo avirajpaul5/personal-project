@@ -81,17 +81,16 @@ export default function Window({
     onMaximize();
   };
 
-  const handleDragStop = (_e: any, d: { x: number; y: number }) => {
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
+const handleDragStop = (_e: any, d: { x: number; y: number }) => {
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
 
-    // Calculate bounded coordinates
-    const newX = Math.max(0, Math.min(d.x, windowWidth - size.width));
-    const newY = Math.max(0, Math.min(d.y, windowHeight - size.height));
+  // Add smooth boundaries with 20px margin
+  const newX = Math.max(20, Math.min(d.x, windowWidth - size.width - 20));
+  const newY = Math.max(20, Math.min(d.y, windowHeight - size.height - 20));
 
-    // Update parent with new position
-    onPositionChange(newX, newY);
-  };
+  onPositionChange(newX, newY);
+};
 
   if (!isOpen && !isClosing && !isVisible) return null;
 
@@ -101,7 +100,8 @@ export default function Window({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        transition: "width 0.3s, height 0.3s, transform 0.3s",
+        transition: "transform 0.2s cubic-bezier(0.22, 1, 0.36, 1)",
+        willChange: "transform",
         ...style,
       }}
       size={

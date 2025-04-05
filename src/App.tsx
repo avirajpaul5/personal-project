@@ -96,6 +96,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
 
+  //Loading
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -104,6 +105,7 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  //Dark mode
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add("dark");
@@ -112,6 +114,7 @@ function App() {
     }
   }, [isDark]);
 
+  //Spotlight 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
