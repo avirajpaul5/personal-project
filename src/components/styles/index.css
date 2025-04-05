@@ -110,3 +110,13 @@ iframe[title="Spotify Playlist"] {
 .window-handle:active {
   cursor: grabbing !important;
 }
+.window-container {
+  transition: opacity 0.2s ease-in-out,
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.window-closing {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+}
