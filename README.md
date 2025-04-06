@@ -44,7 +44,7 @@ A fully interactive portfolio that mimics the macOS experience (or at least trie
 ## 🧪 Run Locally
 
 ```bash
-git clone https://github.com/aviraj/personal-project
+git clone https://github.com/avirajpaul5/personal-project.git
 cd portfolio
 npm install
 npm run dev
