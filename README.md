@@ -1,54 +1,57 @@
-# React + TypeScript + Vite
+# 🖥️ Aviraj's macOS-Inspired Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fully interactive portfolio that mimics the macOS experience (or at least tries to, lol). Designed to showcase my personality, projects, and professional journey through a fun, immersive UI.
 
-Currently, two official plugins are available:
+## 🌐 Live Demo
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+👉 [Visit Portfolio](https://aviraj.vercel.app)
 
-## Expanding the ESLint configuration
+## 🚀 Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- macOS-style **desktop UI**, dock, and menu bar
+- Interactive **Finder** to explore projects, blog posts, resume, and more
+- Customizable **System Settings** with themes, widgets, and wallpapers
+- Easter egg **Terminal** with real commands (e.g., `ls`, `cd`, `sudo hire me`)
+- Live **Mission Control-style dashboard** with stock, GitHub, and fitness widgets *(coming soon)*
+- Spotlight-style **Search** to quickly jump to different sections of the portfolio
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 🛠️ Tech Stack
+
+- **React 19 with TypeScript** – Component-based UI development
+- **Vite** – Fast build tool and dev server
+- **Tailwind CSS** – Utility-first styling
+- **Framer Motion** – Smooth animations
+- **ESLint** – Code linting and quality checks
+- **APIs** – GitHub API, OpenWeather API, Spotify Embed
+- **Hosting** – Vercel
+
+## 🧠 Inspiration
+
+- macOS Ventura
+- A design philosophy rooted in clean, minimal UX
+- My personal interests: tech, finance, fitness, and storytelling
+
+## 🎯 Goals
+
+- Build a creative, standout portfolio with real personality
+- Add modular widgets and multi-theme support
+- Craft a memorable, interactive experience
+
+## 📸 Screenshots
+
+*(Coming Soon)*
+
+## 🧪 Run Locally
+
+```bash
+git clone https://github.com/aviraj/personal-project
+cd portfolio
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 📄 License
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).\
+Feel free to use, fork, and modify it — just give proper credit. 🙌
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
