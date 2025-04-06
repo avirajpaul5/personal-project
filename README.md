@@ -4,7 +4,7 @@ A fully interactive portfolio that mimics the macOS experience (or at least trie
 
 ## 🌐 Live Demo
 
-👉 [Visit Portfolio](https://aviraj.vercel.app)
+👉 [Visit Portfolio](https://avirajpaul.vercel.app/)
 
 ## 🚀 Features
 
