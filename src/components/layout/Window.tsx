@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Rnd } from "react-rnd";
 import clsx from "clsx";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface WindowProps {
   title: string;
@@ -32,39 +33,29 @@ export default function Window({
   isDark,
 }: WindowProps) {
   const [size, setSize] = useState({ width: 600, height: 400 });
-  const [isClosing, setIsClosing] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [isMinimizing, setIsMinimizing] = useState(false);
   const windowRef = useRef<HTMLDivElement>(null);
   const previousSize = useRef({ width: 600, height: 400 });
   const previousPosition = useRef({ x: 100, y: 100 });
+  const [exitType, setExitType] = useState<"close" | "minimize">("close");
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (isOpen && !isClosing) {
+    if (isOpen) {
       setIsVisible(true);
-      setIsClosing(false);
-      setIsMinimizing(false);
     }
-  }, [isOpen, isClosing]);
+  }, [isOpen]);
 
   const handleClose = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-      setIsClosing(false);
-      setIsVisible(false);
-    }, 400);
+    setExitType("close");
+    setIsVisible(false);
   };
 
   const handleMinimize = () => {
-    setIsMinimizing(true);
-    setTimeout(() => {
-      setIsVisible(false);
-      setIsMinimizing(false);
-      onMinimize();
-    }, 400);
+    setExitType("minimize");
+    setIsVisible(false);
   };
 
+  // Working maximize logic
   const handleMaximize = () => {
     if (!isMaximized) {
       previousSize.current = size;
@@ -84,107 +75,151 @@ export default function Window({
   const handleDragStop = (_e: any, d: { x: number; y: number }) => {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
-
-    // Calculate bounded coordinates
-    const newX = Math.max(0, Math.min(d.x, windowWidth - size.width));
-    const newY = Math.max(0, Math.min(d.y, windowHeight - size.height));
-
-    // Update parent with new position
+    const newX = Math.max(20, Math.min(d.x, windowWidth - size.width - 20));
+    const newY = Math.max(20, Math.min(d.y, windowHeight - size.height - 20));
     onPositionChange(newX, newY);
   };
 
-  if (!isOpen && !isClosing && !isVisible) return null;
+  const exitVariants = {
+    close: {
+      opacity: 0,
+      scale: 0.95,
+      transition: { duration: 0.3 },
+    },
+    minimize: {
+      y: 100,
+      scale: 0.8,
+      opacity: 0.5,
+      filter: "blur(4px)",
+      transition: {
+        duration: 0.4,
+        ease: [0.68, -0.55, 0.27, 1.55],
+      },
+    },
+  };
+
+  // Use a conditional container style:
+  // When maximized, cover the entire viewport (and hence the navbar)
+  // Otherwise, let the container be absolutely positioned so multiple windows can coexist.
+  const containerStyle = isMaximized
+    ? {
+        position: "fixed" as const,
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        zIndex: style?.zIndex || 1000,
+        originX: 0.5,
+        originY: 0.5,
+      }
+    : {
+        position: "absolute" as const,
+        zIndex: style?.zIndex || 1000,
+      };
 
   return (
-    <Rnd
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        transition: "width 0.3s, height 0.3s, transform 0.3s",
-        ...style,
+    <AnimatePresence
+      onExitComplete={() => {
+        if (exitType === "close") onClose();
+        if (exitType === "minimize") onMinimize();
       }}
-      size={
-        isMaximized
-          ? { width: window.innerWidth, height: window.innerHeight }
-          : size
-      }
-      position={isMaximized ? { x: 0, y: 0 } : { x, y }}
-      onDragStop={handleDragStop}
-      onResize={(_e, _direction, ref, _delta, position) => {
-        setSize({
-          width: parseInt(ref.style.width),
-          height: parseInt(ref.style.height),
-        });
-        onPositionChange(position.x, position.y);
-      }}
-      dragHandleClassName="window-handle"
-      disableDragging={isMaximized}
-      enableResizing={!isMaximized}
-      bounds="window"
     >
-      <div
-        ref={windowRef}
-        className={clsx(
-          "window-container",
-          "flex flex-col backdrop-blur-lg rounded-lg shadow-lg window-transition",
-          "border w-full h-full overflow-hidden",
-          isClosing ? "genie-exit" : "genie-enter",
-          isMinimizing && "window-minimized",
-          isMaximized && "window-maximized",
-          isDark
-            ? "bg-gray-800/90 border-gray-600"
-            : "bg-white/90 border-gray-200"
-        )}
-      >
-        <div
-          className={clsx(
-            "window-handle flex items-center p-2 border-b",
-            isDark
-              ? "bg-gray-700 border-gray-600"
-              : "bg-gray-100 border-gray-200"
-          )}
+      {isVisible && (
+        <motion.div
+          style={containerStyle}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+          exit={exitVariants[exitType]}
+          transition={{ type: "spring", damping: 20, stiffness: 200 }}
         >
-          <div className="flex space-x-2">
-            <button
-              onClick={handleClose}
-              className={clsx(
-                "w-4 h-4 flex items-center justify-center rounded-full transition-colors",
-                isDark
-                  ? "bg-red-500 hover:bg-red-400"
-                  : "bg-red-500 hover:bg-red-600"
-              )}
-            ></button>
-            <button
-              onClick={handleMinimize}
-              className={clsx(
-                "w-4 h-4 flex items-center justify-center rounded-full transition-colors",
-                isDark
-                  ? "bg-yellow-500 hover:bg-yellow-400"
-                  : "bg-yellow-500 hover:bg-yellow-600"
-              )}
-            ></button>
-            <button
-              onClick={handleMaximize}
-              className={clsx(
-                "w-4 h-4 flex items-center justify-center rounded-full transition-colors",
-                isDark
-                  ? "bg-green-500 hover:bg-green-400"
-                  : "bg-green-500 hover:bg-green-600"
-              )}
-            ></button>
-          </div>
-          <span
-            className={clsx(
-              "flex-1 text-center text-sm font-medium",
-              isDark ? "text-gray-200" : "text-gray-700"
-            )}
+          <Rnd
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "width 0.3s, height 0.3s, transform 0.3s",
+              ...style,
+            }}
+            size={
+              isMaximized
+                ? { width: window.innerWidth, height: window.innerHeight }
+                : size
+            }
+            position={isMaximized ? { x: 0, y: 0 } : { x, y }}
+            onDragStop={handleDragStop}
+            onResize={(_e, _direction, ref, _delta, position) => {
+              setSize({
+                width: parseInt(ref.style.width),
+                height: parseInt(ref.style.height),
+              });
+              onPositionChange(position.x, position.y);
+            }}
+            dragHandleClassName="window-handle"
+            disableDragging={isMaximized}
+            enableResizing={!isMaximized}
+            bounds="window"
           >
-            {title}
-          </span>
-        </div>
-        <div className="flex-1 overflow-auto p-4">{children}</div>
-      </div>
-    </Rnd>
+            <div
+              ref={windowRef}
+              className={clsx(
+                "flex flex-col backdrop-blur-lg rounded-lg shadow-lg",
+                "border w-full h-full overflow-hidden",
+                isDark
+                  ? "bg-gray-800/90 border-gray-600"
+                  : "bg-white/90 border-gray-200"
+              )}
+            >
+              <div
+                className={clsx(
+                  "window-handle flex items-center p-2 border-b",
+                  isDark
+                    ? "bg-gray-700 border-gray-600"
+                    : "bg-gray-100 border-gray-200"
+                )}
+              >
+                <div className="flex space-x-2">
+                  <button
+                    onClick={handleClose}
+                    className={clsx(
+                      "w-4 h-4 rounded-full transition-colors",
+                      isDark
+                        ? "bg-red-500 hover:bg-red-400"
+                        : "bg-red-500 hover:bg-red-600"
+                    )}
+                  />
+                  <button
+                    onClick={handleMinimize}
+                    className={clsx(
+                      "w-4 h-4 rounded-full transition-colors",
+                      isDark
+                        ? "bg-yellow-500 hover:bg-yellow-400"
+                        : "bg-yellow-500 hover:bg-yellow-600"
+                    )}
+                  />
+                  <button
+                    onClick={handleMaximize}
+                    className={clsx(
+                      "w-4 h-4 rounded-full transition-colors",
+                      isDark
+                        ? "bg-green-500 hover:bg-green-400"
+                        : "bg-green-500 hover:bg-green-600"
+                    )}
+                  />
+                </div>
+                <span
+                  className={clsx(
+                    "flex-1 text-center text-sm font-medium",
+                    isDark ? "text-gray-200" : "text-gray-700"
+                  )}
+                >
+                  {title}
+                </span>
+              </div>
+              <div className="flex-1 overflow-auto p-4">{children}</div>
+            </div>
+          </Rnd>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
