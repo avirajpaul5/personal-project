@@ -1,8 +1,9 @@
 // Import necessary dependencies
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Rnd } from "react-rnd";
 import clsx from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
+import type { DraggableData, DraggableEvent } from "react-draggable";
 
 // Define the props interface for the Window component
 interface WindowProps {
@@ -36,13 +37,13 @@ export default function Window({
   isDark,
 }: WindowProps) {
   // State for window size and visibility
-  const [size, setSize] = useState({ width: 600, height: 400 });
+  const [size, setSize] = useState({ width: 540, height: 360 });
   const [isVisible, setIsVisible] = useState(false);
 
   // Refs for storing previous size and position
   const windowRef = useRef<HTMLDivElement>(null);
-  const previousSize = useRef({ width: 600, height: 400 });
-  const previousPosition = useRef({ x: 100, y: 100 });
+  const previousSize = useRef({ width: 540, height: 360 });
+  const previousPosition = useRef({ x: 90, y: 90 });
 
   // State for exit animation type
   const [exitType, setExitType] = useState<"close" | "minimize">("close");
@@ -66,38 +67,41 @@ export default function Window({
     setIsVisible(false);
   };
 
-  // Handler for maximizing/restoring the window
+  // Fixed maximize handler
   const handleMaximize = () => {
     if (!isMaximized) {
-      // Store current size and position before maximizing
       previousSize.current = size;
       previousPosition.current = { x, y };
       setSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
+        width: window.innerWidth, // Using window.innerWidth instead of document.documentElement.clientWidth
+        height: window.innerHeight, // Using window.innerHeight instead of document.documentElement.clientHeight
       });
       onPositionChange(0, 0);
     } else {
-      // Restore previous size and position
       setSize(previousSize.current);
       onPositionChange(previousPosition.current.x, previousPosition.current.y);
     }
     onMaximize();
   };
 
-  // Handler for drag stop event
-  const handleDragStop = (_e: any, d: { x: number; y: number }) => {
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
+  // Handler for drag stop event with snap-to-grid (grid size set to 10px)
+  const handleDragStop = (_e: DraggableEvent, d: DraggableData) => {
+    const windowWidth = document.documentElement.clientWidth;
+    const windowHeight = document.documentElement.clientHeight;
+    const GRID_SIZE = 10;
 
-    // Ensure the window stays within the viewport
-    const newX = Math.max(20, Math.min(d.x, windowWidth - size.width - 20));
-    const newY = Math.max(20, Math.min(d.y, windowHeight - size.height - 20));
+    // Snap the position to the nearest GRID_SIZE multiple
+    const snappedX = Math.round(d.x / GRID_SIZE) * GRID_SIZE;
+    const snappedY = Math.round(d.y / GRID_SIZE) * GRID_SIZE;
+
+    // Ensure the window stays fully within viewport bounds
+    const newX = Math.max(0, Math.min(snappedX, windowWidth - size.width));
+    const newY = Math.max(0, Math.min(snappedY, windowHeight - size.height));
 
     onPositionChange(newX, newY);
   };
 
-  // Define exit animation variants
+  // Define exit animation variants for close and minimize
   const exitVariants = {
     close: {
       opacity: 0,
@@ -116,10 +120,23 @@ export default function Window({
     },
   };
 
+  // Memoize the container class for clarity
+  const containerClass = useMemo(
+    () =>
+      clsx(
+        "flex flex-col backdrop-blur-sm shadow-lg box-border",
+        "border w-full h-full overflow-hidden",
+        !isMaximized && "rounded-lg", // Remove rounded corners when maximized
+        isDark
+          ? "bg-gray-800/90 border-gray-600"
+          : "bg-white/90 border-gray-200"
+      ),
+    [isDark, isMaximized]
+  );
+
   return (
     <AnimatePresence
       onExitComplete={() => {
-        // Trigger appropriate action after exit animation
         if (exitType === "close") onClose();
         if (exitType === "minimize") onMinimize();
       }}
@@ -127,23 +144,19 @@ export default function Window({
       {isVisible && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            filter: "blur(0px)",
-          }}
+          animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
           exit={exitVariants[exitType]}
-          transition={{
-            type: "spring",
-            damping: 20,
-            stiffness: 200,
-          }}
+          transition={{ type: "spring", damping: 20, stiffness: 200 }}
           style={{
             position: "fixed",
             zIndex: style?.zIndex || 1000,
-            originX: 0.5,
-            originY: 0.5,
+            // When maximized, force the container to cover the viewport
+            top: isMaximized ? 0 : undefined,
+            left: isMaximized ? 0 : undefined,
+            width: isMaximized ? window.innerWidth : undefined,
+            height: isMaximized ? window.innerHeight : undefined,
+            originX: isMaximized ? 0 : 0.5,
+            originY: isMaximized ? 0 : 0.5,
           }}
         >
           <Rnd
@@ -151,6 +164,8 @@ export default function Window({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              transition:
+                "width 0.4s ease, height 0.4s ease, transform 0.4s ease",
               ...style,
             }}
             size={
@@ -172,17 +187,7 @@ export default function Window({
             enableResizing={!isMaximized}
             bounds="window"
           >
-            <div
-              ref={windowRef}
-              className={clsx(
-                "flex flex-col backdrop-blur-lg rounded-lg shadow-lg",
-                "border w-full h-full overflow-hidden",
-                isDark
-                  ? "bg-gray-800/90 border-gray-600"
-                  : "bg-white/90 border-gray-200"
-              )}
-            >
-              {/* Window title bar */}
+            <div ref={windowRef} className={containerClass}>
               <div
                 className={clsx(
                   "window-handle flex items-center p-2 border-b",
@@ -191,12 +196,11 @@ export default function Window({
                     : "bg-gray-100 border-gray-200"
                 )}
               >
-                {/* Window control buttons */}
-                <div className="flex space-x-2">
+                <div className="flex space-x-1">
                   <button
                     onClick={handleClose}
                     className={clsx(
-                      "w-4 h-4 rounded-full transition-colors",
+                      "w-3 h-3 rounded-full transition-colors",
                       isDark
                         ? "bg-red-500 hover:bg-red-400"
                         : "bg-red-500 hover:bg-red-600"
@@ -205,7 +209,7 @@ export default function Window({
                   <button
                     onClick={handleMinimize}
                     className={clsx(
-                      "w-4 h-4 rounded-full transition-colors",
+                      "w-3 h-3 rounded-full transition-colors",
                       isDark
                         ? "bg-yellow-500 hover:bg-yellow-400"
                         : "bg-yellow-500 hover:bg-yellow-600"
@@ -214,14 +218,13 @@ export default function Window({
                   <button
                     onClick={handleMaximize}
                     className={clsx(
-                      "w-4 h-4 rounded-full transition-colors",
+                      "w-3 h-3 rounded-full transition-colors",
                       isDark
                         ? "bg-green-500 hover:bg-green-400"
                         : "bg-green-500 hover:bg-green-600"
                     )}
                   />
                 </div>
-                {/* Window title */}
                 <span
                   className={clsx(
                     "flex-1 text-center text-sm font-medium",
@@ -231,8 +234,7 @@ export default function Window({
                   {title}
                 </span>
               </div>
-              {/* Window content */}
-              <div className="flex-1 overflow-auto p-4">{children}</div>
+              <div className="flex-1 overflow-auto p-3">{children}</div>
             </div>
           </Rnd>
         </motion.div>
