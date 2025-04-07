@@ -1,8 +1,12 @@
+// Import necessary dependencies
 import { useState, useEffect, useRef } from "react";
 import { Rnd } from "react-rnd";
 import clsx from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
 
+/**
+ * Window component props interface
+ */
 interface WindowProps {
   title: string;
   isOpen: boolean;
@@ -18,6 +22,9 @@ interface WindowProps {
   isDark: boolean;
 }
 
+/**
+ * Window component for creating resizable and draggable windows
+ */
 export default function Window({
   title,
   isOpen,
@@ -32,46 +39,67 @@ export default function Window({
   style,
   isDark,
 }: WindowProps) {
+  // State for window size and visibility
   const [size, setSize] = useState({ width: 600, height: 400 });
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Refs for storing previous window state
   const windowRef = useRef<HTMLDivElement>(null);
   const previousSize = useRef({ width: 600, height: 400 });
   const previousPosition = useRef({ x: 100, y: 100 });
-  const [exitType, setExitType] = useState<"close" | "minimize">("close");
-  const [isVisible, setIsVisible] = useState(false);
 
+  // State for exit animation type
+  const [exitType, setExitType] = useState<"close" | "minimize">("close");
+
+  // Effect to set visibility when window is opened
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
     }
   }, [isOpen]);
 
+  /**
+   * Handle window close action
+   */
   const handleClose = () => {
     setExitType("close");
     setIsVisible(false);
   };
 
+  /**
+   * Handle window minimize action
+   */
   const handleMinimize = () => {
     setExitType("minimize");
     setIsVisible(false);
   };
 
-  // Working maximize logic
+  /**
+   * Handle window maximize/restore action
+   */
   const handleMaximize = () => {
     if (!isMaximized) {
+      // Store current size and position before maximizing
       previousSize.current = size;
       previousPosition.current = { x, y };
+      // Set window size to full screen
       setSize({
         width: window.innerWidth,
         height: window.innerHeight,
       });
       onPositionChange(0, 0);
     } else {
+      // Restore previous size and position
       setSize(previousSize.current);
       onPositionChange(previousPosition.current.x, previousPosition.current.y);
     }
     onMaximize();
   };
 
+  /**
+   * Handle window drag stop event
+   * Ensures the window stays within the viewport
+   */
   const handleDragStop = (_e: any, d: { x: number; y: number }) => {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
@@ -80,6 +108,7 @@ export default function Window({
     onPositionChange(newX, newY);
   };
 
+  // Define exit animation variants
   const exitVariants = {
     close: {
       opacity: 0,
@@ -98,9 +127,7 @@ export default function Window({
     },
   };
 
-  // Use a conditional container style:
-  // When maximized, cover the entire viewport (and hence the navbar)
-  // Otherwise, let the container be absolutely positioned so multiple windows can coexist.
+  // Conditional container style for maximized and normal state
   const containerStyle = isMaximized
     ? {
         position: "fixed" as const,
@@ -169,6 +196,7 @@ export default function Window({
                   : "bg-white/90 border-gray-200"
               )}
             >
+              {/* Window title bar */}
               <div
                 className={clsx(
                   "window-handle flex items-center p-2 border-b",
@@ -177,6 +205,7 @@ export default function Window({
                     : "bg-gray-100 border-gray-200"
                 )}
               >
+                {/* Window control buttons */}
                 <div className="flex space-x-2">
                   <button
                     onClick={handleClose}
@@ -206,6 +235,7 @@ export default function Window({
                     )}
                   />
                 </div>
+                {/* Window title */}
                 <span
                   className={clsx(
                     "flex-1 text-center text-sm font-medium",
@@ -215,6 +245,7 @@ export default function Window({
                   {title}
                 </span>
               </div>
+              {/* Window content */}
               <div className="flex-1 overflow-auto p-4">{children}</div>
             </div>
           </Rnd>
