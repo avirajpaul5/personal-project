@@ -1,3 +1,4 @@
+// Import necessary dependencies and components
 import { useState, useEffect } from "react";
 import { Window as WindowType } from "./components/utils/types";
 import Window from "./components/layout/Window";
@@ -12,15 +13,16 @@ import Terminal from "./components/sections/Terminal";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 
-// You can customize these background images by replacing the URLs
+// Define background images for light and dark modes
 const BACKGROUNDS = {
   light:
     "url('https://images.unsplash.com/photo-1604147495798-57beb5d6af73?q=80&w=2000')",
   dark: "url('https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=2000')",
 };
 
-// Define initialApps outside the component but without terminal commands
+// Define initial state for app windows
 const initialApps: WindowType[] = [
+  // Home app configuration
   {
     id: "home",
     title: "Home",
@@ -40,6 +42,7 @@ const initialApps: WindowType[] = [
       </div>
     ),
   },
+  // About app configuration
   {
     id: "about",
     title: "About",
@@ -52,6 +55,7 @@ const initialApps: WindowType[] = [
     lastActive: 0,
     component: About,
   },
+  // Projects app configuration
   {
     id: "projects",
     title: "Projects",
@@ -64,6 +68,7 @@ const initialApps: WindowType[] = [
     lastActive: 0,
     component: Projects,
   },
+  // Contact app configuration
   {
     id: "contact",
     title: "Contact",
@@ -76,6 +81,7 @@ const initialApps: WindowType[] = [
     lastActive: 0,
     component: Contact,
   },
+  // Terminal app configuration
   {
     id: "terminal",
     title: "Terminal",
@@ -90,13 +96,15 @@ const initialApps: WindowType[] = [
   },
 ];
 
+// Main App component
 function App() {
+  // State hooks for managing app state
   const [apps, setApps] = useState<WindowType[]>(initialApps);
   const [isDark, setIsDark] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
 
-  //Loading
+  // Effect hook for initial loading
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
@@ -105,7 +113,7 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  //Dark mode
+  // Effect hook for managing dark mode
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add("dark");
@@ -114,7 +122,7 @@ function App() {
     }
   }, [isDark]);
 
-  //Spotlight
+  // Effect hook for spotlight search keyboard shortcut
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -127,6 +135,7 @@ function App() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
+  // Handler for app click events
   const handleAppClick = (id: string) => {
     setApps((prevApps) =>
       prevApps.map((app) => {
@@ -148,6 +157,7 @@ function App() {
     );
   };
 
+  // Handler for minimizing apps
   const onMinimizeApp = (id: string) => {
     setApps((prev) =>
       prev.map((app) =>
@@ -156,6 +166,7 @@ function App() {
     );
   };
 
+  // Handler for restoring minimized apps
   const onRestoreApp = (id: string) => {
     setApps((prevApps) =>
       prevApps.map((app) =>
@@ -171,12 +182,14 @@ function App() {
     );
   };
 
+  // Handler for closing apps
   const handleClose = (id: string) => {
     setApps((prevApps) =>
       prevApps.map((app) => (app.id === id ? { ...app, isOpen: false } : app))
     );
   };
 
+  // Handler for closing apps from the dock
   const handleCloseApp = (id: string) => {
     setApps((prevApps) =>
       prevApps.map((app) =>
@@ -185,6 +198,7 @@ function App() {
     );
   };
 
+  // Handler for minimizing apps
   const handleMinimize = (id: string) => {
     setApps((prevApps) =>
       prevApps.map((app) =>
@@ -193,6 +207,7 @@ function App() {
     );
   };
 
+  // Handler for maximizing apps
   const handleMaximize = (id: string) => {
     setApps((prevApps) =>
       prevApps.map((app) => {
@@ -219,6 +234,7 @@ function App() {
     );
   };
 
+  // Handler for changing app window position
   const handlePositionChange = (id: string, newX: number, newY: number) => {
     setApps((prevApps) =>
       prevApps.map((app) =>
@@ -244,6 +260,7 @@ function App() {
     }
   };
 
+  // Render the main app component
   return (
     <div
       className={clsx(
@@ -339,4 +356,5 @@ function App() {
   );
 }
 
+// Export the App component as the default export
 export default App;
