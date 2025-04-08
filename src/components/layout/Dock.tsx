@@ -1,3 +1,4 @@
+// Import necessary dependencies
 import { useState, useRef } from "react";
 import { Window } from "../utils/types";
 import clsx from "clsx";
@@ -10,6 +11,7 @@ import {
   MotionValue,
 } from "framer-motion";
 
+// Define the props for the Dock component
 interface DockProps {
   apps: Window[];
   isDark: boolean;
@@ -19,6 +21,7 @@ interface DockProps {
   onCloseApp: (id: string) => void;
 }
 
+// Main Dock component
 export default function Dock({
   apps,
   isDark,
@@ -27,10 +30,13 @@ export default function Dock({
   onRestoreApp,
   onCloseApp,
 }: DockProps) {
+  // State for tracking hovered minimized app
   const [hoveredMinimizedApp, setHoveredMinimizedApp] = useState<string | null>(
     null
   );
+  // Motion value for mouse X position
   const mouseX = useMotionValue(Infinity);
+  // Filter minimized apps
   const minimizedApps = apps.filter((app) => app.isMinimized);
 
   return (
@@ -95,6 +101,7 @@ export default function Dock({
   );
 }
 
+// DockIcon component for non-minimized apps
 function DockIcon({
   app,
   mouseX,
@@ -110,11 +117,13 @@ function DockIcon({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
+  // Calculate distance from mouse to icon center
   const distance = useTransform(mouseX, (val: number) => {
     const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
     return val - bounds.x - bounds.width / 2;
   });
 
+  // Scale based on mouse distance
   const scaleSync = useTransform(distance, [-150, 0, 150], [1, 1.3, 1]);
   const scale = useSpring(scaleSync, {
     mass: 0.2,
@@ -122,6 +131,7 @@ function DockIcon({
     damping: 12,
   });
 
+  // Y position based on scale
   const ySync = useTransform(scale, [1, 1.3], [0, -8]);
   const y = useSpring(ySync, { stiffness: 300, damping: 12 });
 
@@ -149,6 +159,7 @@ function DockIcon({
           alt={app.title}
           className="w-10 h-10 transform transition-transform duration-200"
         />
+        {/* Tooltip */}
         <div
           className={clsx(
             "absolute -top-10 left-1/2 -translate-x-1/2",
@@ -158,6 +169,7 @@ function DockIcon({
           )}
         >
           {app.title}
+          {/* Tooltip arrow */}
           <div
             className={clsx(
               "absolute bottom-0 left-1/2 -translate-x-1/2",
@@ -167,6 +179,7 @@ function DockIcon({
           ></div>
         </div>
       </button>
+      {/* Indicator for open, non-minimized apps */}
       {app.isOpen && !app.isMinimized && (
         <div
           className={clsx(
@@ -180,6 +193,7 @@ function DockIcon({
   );
 }
 
+// MinimizedDockIcon component for minimized apps
 function MinimizedDockIcon({
   app,
   mouseX,
@@ -199,11 +213,13 @@ function MinimizedDockIcon({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
+  // Calculate distance from mouse to icon center
   const distance = useTransform(mouseX, (val: number) => {
     const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
     return val - bounds.x - bounds.width / 2;
   });
 
+  // Scale based on mouse distance
   const scaleSync = useTransform(
     distance,
     [-200, -50, 0, 50, 200],
@@ -215,6 +231,7 @@ function MinimizedDockIcon({
     damping: 15,
   });
 
+  // Y position based on scale
   const ySync = useTransform(scale, [1, 1.3], [0, -8]);
   const y = useSpring(ySync, { stiffness: 400, damping: 15 });
 
@@ -245,6 +262,7 @@ function MinimizedDockIcon({
             alt={app.title}
             className="w-10 h-10 opacity-70 transform transition-transform duration-200 hover:scale-105"
           />
+          {/* Close button for hovered minimized app */}
           {hoveredMinimizedApp === app.id && (
             <button
               onClick={(e) => {
