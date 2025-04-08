@@ -103,8 +103,8 @@ export default function Window({
   const handleDragStop = (_e: any, d: { x: number; y: number }) => {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
-    const newX = Math.max(20, Math.min(d.x, windowWidth - size.width - 20));
-    const newY = Math.max(20, Math.min(d.y, windowHeight - size.height - 20));
+    const newX = Math.max(0, Math.min(d.x, windowWidth - size.width));
+    const newY = Math.max(0, Math.min(d.y, windowHeight - size.height));
     onPositionChange(newX, newY);
   };
 
