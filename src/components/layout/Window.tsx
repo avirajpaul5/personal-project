@@ -40,12 +40,12 @@ export default function Window({
   isDark,
 }: WindowProps) {
   // State for window size and visibility
-  const [size, setSize] = useState({ width: 600, height: 400 });
+  const [size, setSize] = useState({ width: 550, height: 350 });
   const [isVisible, setIsVisible] = useState(false);
 
   // Refs for storing previous window state
   const windowRef = useRef<HTMLDivElement>(null);
-  const previousSize = useRef({ width: 600, height: 400 });
+  const previousSize = useRef({ width: 550, height: 350 });
   const previousPosition = useRef({ x: 100, y: 100 });
 
   // State for exit animation type
@@ -186,14 +186,15 @@ export default function Window({
             enableResizing={!isMaximized}
             bounds="window"
           >
+            {/* Main window container */}
             <div
               ref={windowRef}
               className={clsx(
-                "flex flex-col backdrop-blur-lg rounded-lg shadow-lg",
+                "flex flex-col backdrop-blur-md rounded-md shadow-md",
                 "border w-full h-full overflow-hidden",
                 isDark
-                  ? "bg-gray-800/90 border-gray-600"
-                  : "bg-white/90 border-gray-200"
+                  ? "bg-gray-800/95 border-gray-600"
+                  : "bg-white/95 border-gray-200"
               )}
             >
               {/* Window title bar */}
@@ -206,11 +207,11 @@ export default function Window({
                 )}
               >
                 {/* Window control buttons */}
-                <div className="flex space-x-2">
+                <div className="flex space-x-2 pl-2">
                   <button
                     onClick={handleClose}
                     className={clsx(
-                      "w-4 h-4 rounded-full transition-colors",
+                      "w-3 h-3 rounded-full transition-colors",
                       isDark
                         ? "bg-red-500 hover:bg-red-400"
                         : "bg-red-500 hover:bg-red-600"
@@ -219,7 +220,7 @@ export default function Window({
                   <button
                     onClick={handleMinimize}
                     className={clsx(
-                      "w-4 h-4 rounded-full transition-colors",
+                      "w-3 h-3 rounded-full transition-colors",
                       isDark
                         ? "bg-yellow-500 hover:bg-yellow-400"
                         : "bg-yellow-500 hover:bg-yellow-600"
@@ -228,7 +229,7 @@ export default function Window({
                   <button
                     onClick={handleMaximize}
                     className={clsx(
-                      "w-4 h-4 rounded-full transition-colors",
+                      "w-3 h-3 rounded-full transition-colors",
                       isDark
                         ? "bg-green-500 hover:bg-green-400"
                         : "bg-green-500 hover:bg-green-600"
@@ -238,7 +239,7 @@ export default function Window({
                 {/* Window title */}
                 <span
                   className={clsx(
-                    "flex-1 text-center text-sm font-medium",
+                    "flex-1 text-center text-xs font-medium",
                     isDark ? "text-gray-200" : "text-gray-700"
                   )}
                 >
@@ -246,7 +247,7 @@ export default function Window({
                 </span>
               </div>
               {/* Window content */}
-              <div className="flex-1 overflow-auto p-4">{children}</div>
+              <div className="flex-1 overflow-auto p-2">{children}</div>
             </div>
           </Rnd>
         </motion.div>
