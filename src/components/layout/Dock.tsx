@@ -45,8 +45,8 @@ export default function Dock({
         onMouseMove={(e) => mouseX.set(e.pageX)}
         onMouseLeave={() => mouseX.set(Infinity)}
         className={clsx(
-          "fixed bottom-4 left-1/2 -translate-x-1/2",
-          "flex items-end backdrop-blur-xxl rounded-2xl shadow-lg px-4 py-2",
+          "fixed bottom-3 left-1/2 -translate-x-1/2",
+          "flex items-end backdrop-blur-xxl rounded-xl shadow-md px-3 py-2",
           "transition-colors duration-300",
           isDark
             ? "bg-gray-900/30 border border-gray-700/50"
@@ -54,7 +54,7 @@ export default function Dock({
         )}
       >
         {/* Open Apps Section */}
-        <div className="flex items-end space-x-2">
+        <div className="flex items-end space-x-3">
           {apps
             .filter((app) => !app.isMinimized)
             .map((app) => (
@@ -73,7 +73,7 @@ export default function Dock({
         {minimizedApps.length > 0 && (
           <div
             className={clsx(
-              "w-px h-10 mx-4",
+              "w-px h-9 mx-3",
               isDark ? "bg-gray-600" : "bg-gray-300"
             )}
           />
@@ -81,7 +81,7 @@ export default function Dock({
 
         {/* Minimized Apps Section */}
         {minimizedApps.length > 0 && (
-          <div className="flex items-end space-x-6">
+          <div className="flex items-end space-x-5">
             {minimizedApps.map((app) => (
               <MinimizedDockIcon
                 key={app.id}
@@ -150,19 +150,18 @@ function DockIcon({
           app.isOpen ? onMinimizeApp(app.id) : onAppClick(app.id)
         }
         className={clsx(
-          "relative p-2 rounded-xl flex flex-col items-center top-1 pb-3"
-          // isDark ? "hover:bg-white/10" : "hover:bg-black/10"
+          "relative p-2 rounded-lg flex flex-col items-center top-1 pb-3"
         )}
       >
         <img
           src={app.icon}
           alt={app.title}
-          className="w-10 h-10 transform transition-transform duration-200"
+          className="w-9 h-9 transform transition-transform duration-200"
         />
         {/* Tooltip */}
         <div
           className={clsx(
-            "absolute -top-10 left-1/2 -translate-x-1/2",
+            "absolute -top-7 left-1/2 -translate-x-1/2",
             "opacity-0 group-hover:opacity-100 transition-opacity",
             "px-2 py-1 text-xs rounded-md whitespace-nowrap",
             isDark ? "bg-gray-800 text-gray-200" : "bg-gray-100 text-gray-900"
@@ -251,7 +250,7 @@ function MinimizedDockIcon({
           onMouseEnter={() => setHoveredMinimizedApp(app.id)}
           onMouseLeave={() => setHoveredMinimizedApp(null)}
           className={clsx(
-            "p-2 rounded-xl flex flex-col items-center relative",
+            "p-2 rounded-lg flex flex-col items-center relative",
             isDark
               ? "bg-gray-700 hover:bg-gray-600"
               : "bg-gray-200 hover:bg-gray-300"
@@ -260,7 +259,7 @@ function MinimizedDockIcon({
           <img
             src={app.icon}
             alt={app.title}
-            className="w-10 h-10 opacity-70 transform transition-transform duration-200 hover:scale-105"
+            className="w-8 h-8 opacity-70 transform transition-transform duration-200 hover:scale-105"
           />
           {/* Close button for hovered minimized app */}
           {hoveredMinimizedApp === app.id && (
@@ -270,7 +269,7 @@ function MinimizedDockIcon({
                 onCloseApp(app.id);
               }}
               className={clsx(
-                "absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center p-0.5",
+                "absolute -top-1 -right-1 w-3 h-3 rounded-full flex items-center justify-center p-0.5",
                 isDark
                   ? "bg-red-500 hover:bg-red-400 text-gray-200"
                   : "bg-red-500 hover:bg-red-600 text-white"
