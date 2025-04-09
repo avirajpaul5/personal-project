@@ -1,21 +1,28 @@
+// Import necessary dependencies
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { useRef, useEffect } from "react";
 import { WeatherWidget, WorldClockWidget } from "../common/Widgets";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 
+// Define props interface for NotificationCenter component
 interface NotificationCenterProps {
   isOpen: boolean;
-  isDark: boolean;
   onClose: () => void;
 }
 
+/**
+ * NotificationCenter component
+ * Displays a sliding panel with various widgets and information
+ */
 export default function NotificationCenter({
   isOpen,
   onClose,
 }: NotificationCenterProps) {
+  // Reference to the panel element for click outside detection
   const panelRef = useRef<HTMLDivElement>(null);
 
+  // Effect to handle clicks outside the notification center
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const navbar = document.querySelector(".app-navbar");
@@ -27,17 +34,21 @@ export default function NotificationCenter({
         window.contains(event.target as Node)
       );
 
+      // Close the notification center if clicked outside
       if (!isPanelClick && !isNavbarClick && !isWindowClick) {
         onClose();
       }
     };
 
+    // Add event listener when the panel is open
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
+    // Clean up the event listener on component unmount or when panel closes
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, onClose]);
 
+  // Spotify playlist ID for embedded player
   const playlistId = "3rE6ZLp7YXOhSIFSfv4LUM";
 
   return (
@@ -55,6 +66,7 @@ export default function NotificationCenter({
       className="fixed right-0 top-0 h-screen w-96 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl z-[60] overflow-y-auto"
     >
       <div className="pt-7 p-6">
+        {/* Header with date and close button */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">
             {format(new Date(), "EEEE, MMMM d")}
@@ -67,6 +79,7 @@ export default function NotificationCenter({
           </button>
         </div>
 
+        {/* Content area with widgets and Spotify embed */}
         <div className="space-y-4">
           <WorldClockWidget />
           <WeatherWidget />
