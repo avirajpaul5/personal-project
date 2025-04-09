@@ -54,9 +54,9 @@ export default function NotificationCenter({
       style={{ pointerEvents: isOpen ? "auto" : "none" }}
       className="fixed right-0 top-0 h-screen w-96 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl shadow-2xl z-[60] overflow-y-auto"
     >
-      <div className="pt-12 p-4">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold">
+      <div className="pt-7 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">
             {format(new Date(), "EEEE, MMMM d")}
           </h2>
           <button
