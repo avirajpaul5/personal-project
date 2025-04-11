@@ -8,7 +8,6 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 // Define props interface for NotificationCenter component
 interface NotificationCenterProps {
   isOpen: boolean;
-  isDark: boolean;
   onClose: () => void;
 }
 
@@ -18,7 +17,6 @@ interface NotificationCenterProps {
  */
 export default function NotificationCenter({
   isOpen,
-  isDark,
   onClose,
 }: NotificationCenterProps) {
   // Reference to the panel element for click outside detection
