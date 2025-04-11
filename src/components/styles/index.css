@@ -13,10 +13,6 @@ body {
   min-height: 100vh;
 }
 
-.window-handle {
-  cursor: move;
-}
-
 @keyframes genieOpen {
   0% {
     opacity: 0;
@@ -78,6 +74,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
 }
+
 .dock-container {
   transform-style: preserve-3d;
   perspective: 500px;
@@ -93,24 +90,24 @@ body {
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
 }
 
-iframe[title="Spotify Playlist"] {
-  z-index: 9999; /* Ensure it's above other elements */
-  border-radius: 12px; /* Match your UI's border radius */
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); /* Match your UI's shadow */
+.spotify-playlist {
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
 }
 
 .react-draggable-dragging {
   transition: none !important;
-  cursor: grabbing !important;
+  cursor: move !important;
 }
 
 .window-handle {
-  cursor: grab !important;
+  cursor: move !important;
 }
 
 .window-handle:active {
-  cursor: grabbing !important;
+  cursor: move !important;
 }
+
 .window-container {
   transition: opacity 0.2s ease-in-out,
     transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
