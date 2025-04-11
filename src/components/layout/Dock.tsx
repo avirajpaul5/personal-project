@@ -183,8 +183,8 @@ function DockIcon({
         <div
           className={clsx(
             "absolute -bottom-1 left-1/2 -translate-x-1/2",
-            "w-1 h-1 rounded-full",
-            isDark ? "bg-gray-1000" : "bg-gray-600"
+            "w-1 h-1 rounded-full animate-pulse",
+            isDark ? "bg-gray-200" : "bg-gray-100"
           )}
         />
       )}
@@ -269,7 +269,7 @@ function MinimizedDockIcon({
                 onCloseApp(app.id);
               }}
               className={clsx(
-                "absolute -top-1 -right-1 w-3 h-3 rounded-full flex items-center justify-center p-0.5",
+                "absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center p-0.5",
                 isDark
                   ? "bg-red-500 hover:bg-red-400 text-gray-200"
                   : "bg-red-500 hover:bg-red-600 text-white"
