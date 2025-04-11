@@ -57,7 +57,6 @@ export default function Navbar({
       <NotificationCenter
         isOpen={isNotificationCenterOpen}
         onClose={() => setIsNotificationCenterOpen(false)}
-        isDark={isDark}
       />
     </div>
   );
