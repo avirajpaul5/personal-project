@@ -64,6 +64,12 @@ export default function Window({
    * Handle window close action
    */
   const handleClose = () => {
+    if (onBodyClick) {
+      onBodyClick();
+    }
+    if (isMaximized) {
+      onMaximize();
+    }
     setExitType("close");
     setIsVisible(false);
   };
@@ -72,6 +78,9 @@ export default function Window({
    * Handle window minimize action
    */
   const handleMinimize = () => {
+    if (onBodyClick) {
+      onBodyClick();
+    }
     setExitType("minimize");
     setIsVisible(false);
   };
@@ -80,6 +89,9 @@ export default function Window({
    * Handle window maximize/restore action
    */
   const handleMaximize = () => {
+    if (onBodyClick) {
+      onBodyClick();
+    }
     if (!isMaximized) {
       // Store current size and position before maximizing
       previousSize.current = size;
