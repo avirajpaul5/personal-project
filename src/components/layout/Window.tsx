@@ -20,6 +20,7 @@ interface WindowProps {
   onPositionChange: (x: number, y: number) => void;
   style?: React.CSSProperties;
   isDark: boolean;
+  onBodyClick?: () => void;
 }
 
 /**
@@ -38,6 +39,7 @@ export default function Window({
   onPositionChange,
   style,
   isDark,
+  onBodyClick,
 }: WindowProps) {
   // State for window size and visibility
   const [size, setSize] = useState({ width: 550, height: 350 });
@@ -196,6 +198,7 @@ export default function Window({
                   ? "bg-gray-800/95 border-gray-600"
                   : "bg-white/95 border-gray-200"
               )}
+              onClick={onBodyClick}
             >
               {/* Window title bar */}
               <div

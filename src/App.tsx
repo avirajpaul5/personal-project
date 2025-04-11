@@ -260,6 +260,14 @@ function App() {
     }
   };
 
+  const handleWindowFocus = (id: string) => {
+    setApps((prevApps) =>
+      prevApps.map((app) =>
+        app.id === id ? { ...app, lastActive: Date.now() } : app
+      )
+    );
+  };
+
   // Render the main app component
   return (
     <div
@@ -293,7 +301,9 @@ function App() {
             {apps
               .filter((app) => app.isOpen && !app.isMinimized) // Only show open and non-minimized apps
               .sort((a, b) => a.lastActive - b.lastActive) // Sort by lastActive (oldest first)
-              .map((app) => {
+              .map((app, index) => {
+                // Calculate zIndex based on index
+                const zIndex = 1000 + index;
                 // Special handling for terminal
                 if (app.id === "terminal") {
                   return (
@@ -311,7 +321,8 @@ function App() {
                       onClose={() => handleClose(app.id)}
                       onMinimize={() => handleMinimize(app.id)}
                       onMaximize={() => handleMaximize(app.id)}
-                      style={{ zIndex: 1000 + app.lastActive }}
+                      onBodyClick={() => handleWindowFocus(app.id)}
+                      style={{ zIndex }}
                     >
                       <Terminal onCommand={processTerminalCommand} />
                     </Window>
@@ -335,7 +346,8 @@ function App() {
                     onClose={() => handleClose(app.id)}
                     onMinimize={() => handleMinimize(app.id)}
                     onMaximize={() => handleMaximize(app.id)}
-                    style={{ zIndex: 1000 + app.lastActive }}
+                    onBodyClick={() => handleWindowFocus(app.id)}
+                    style={{ zIndex }}
                   >
                     <AppComponent />
                   </Window>
