@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import ThemeToggle from "../common/ThemeToggle";
 import NotificationCenter from "../notifications/NotificationCenter";
+import AppleMenu from "../common/AppleMenu";
 import clsx from "clsx";
 
 export default function Navbar({
@@ -13,6 +14,7 @@ export default function Navbar({
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isNotificationCenterOpen, setIsNotificationCenterOpen] =
     useState(false);
+  const [isAppleMenuOpen, setIsAppleMenuOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -41,7 +43,15 @@ export default function Navbar({
         isDark ? "bg-gray-900/30 text-gray-300" : "bg-white/30 text-gray-900"
       )}
     >
-      <div className="font-semibold">Aviraj Paul</div>
+      <button
+        onClick={() => setIsAppleMenuOpen(true)}
+        className={clsx(
+          "font-semibold hover:bg-opacity-20 px-2 py-0.5 rounded transition-colors -ml-2",
+          isDark ? "hover:bg-white" : "hover:bg-black"
+        )}
+      >
+        Aviraj Paul
+      </button>
       <div className="flex items-center space-x-4">
         <ThemeToggle isDark={isDark} onToggle={onThemeToggle} />
         <button
@@ -52,8 +62,13 @@ export default function Navbar({
           )}
         >
           {formatDate(currentTime)}
-        </button>{" "}
+        </button>
       </div>
+      <AppleMenu
+        isOpen={isAppleMenuOpen}
+        onClose={() => setIsAppleMenuOpen(false)}
+        isDark={isDark}
+      />
       <NotificationCenter
         isOpen={isNotificationCenterOpen}
         onClose={() => setIsNotificationCenterOpen(false)}
