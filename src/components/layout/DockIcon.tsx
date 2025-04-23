@@ -8,9 +8,10 @@ import { useTheme } from "../../contexts/ThemeContext";
 /**
  * DockIcon component props interface
  */
-interface DockIconProps {
+export interface DockIconProps {
   app: Window;
   mouseX: MotionValue<number>;
+  isDark: boolean;
   onAppClick: (id: string) => void;
   onMinimizeApp: (id: string) => void;
 }
@@ -21,11 +22,10 @@ interface DockIconProps {
 export default function DockIcon({
   app,
   mouseX,
+  isDark,
   onAppClick,
   onMinimizeApp,
 }: DockIconProps) {
-  // Get theme from context
-  const { isDark } = useTheme();
   // Use the dock icon animation hook
   const { ref, scale, y } = useDockIconAnimation(mouseX);
 

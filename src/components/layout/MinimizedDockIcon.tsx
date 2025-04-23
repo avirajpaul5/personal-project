@@ -9,9 +9,10 @@ import { useTheme } from "../../contexts/ThemeContext";
 /**
  * MinimizedDockIcon component props interface
  */
-interface MinimizedDockIconProps {
+export interface MinimizedDockIconProps {
   app: Window;
   mouseX: MotionValue<number>;
+  isDark: boolean;
   hoveredMinimizedApp: string | null;
   onRestoreApp: (id: string) => void;
   onCloseApp: (id: string) => void;
@@ -24,19 +25,14 @@ interface MinimizedDockIconProps {
 export default function MinimizedDockIcon({
   app,
   mouseX,
+  isDark,
   hoveredMinimizedApp,
   onRestoreApp,
   onCloseApp,
   setHoveredMinimizedApp,
 }: MinimizedDockIconProps) {
-  // Get theme from context
-  const { isDark } = useTheme();
   // Use the dock icon animation hook with custom ranges for minimized icons
-  const { ref, scale, y } = useDockIconAnimation(
-    mouseX,
-    [-200, -50, 0, 50, 200],
-    [1, 1.2, 1.3, 1.2, 1]
-  );
+  const { ref, scale, y } = useDockIconAnimation(mouseX);
 
   return (
     <motion.div

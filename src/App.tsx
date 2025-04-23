@@ -103,12 +103,8 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
 
   // Use custom hooks
-  const { isDark, toggleTheme, backgrounds } = useTheme();
-  const {
-    isOpen: isSpotlightOpen,
-    openSpotlight,
-    closeSpotlight,
-  } = useSpotlight();
+  const { isDark, backgrounds } = useTheme();
+  const { isOpen: isSpotlightOpen, closeSpotlight } = useSpotlight();
   const {
     windows,
     openWindow,

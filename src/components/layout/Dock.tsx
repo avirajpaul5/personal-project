@@ -4,9 +4,10 @@ import { Window } from "../utils/types";
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import DockIcon from "./DockIcon";
-import MinimizedDockIcon from "./MinimizedDockIcon";
+import MinimizedDockIcon, { MinimizedDockIconProps } from "./MinimizedDockIcon";
 import { useDockMouseTracking } from "../../hooks/useDockAnimation";
 import { useTheme } from "../../contexts/ThemeContext";
+import { DockIconProps } from "./DockIcon";
 
 // Define the props for the Dock component
 interface DockProps {

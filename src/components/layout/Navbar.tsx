@@ -7,7 +7,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 
 export default function Navbar() {
   // Get theme values from context
-  const { isDark, toggleTheme } = useTheme();
+  const { isDark } = useTheme();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isNotificationCenterOpen, setIsNotificationCenterOpen] =
     useState(false);

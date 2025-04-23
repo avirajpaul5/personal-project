@@ -1,5 +1,5 @@
-import React, { createContext, useContext, ReactNode } from 'react';
-import { useTheme as useThemeHook, BACKGROUNDS } from '../hooks/useTheme';
+import { createContext, useContext, ReactNode } from "react";
+import { useTheme as useThemeHook, BACKGROUNDS } from "../hooks/useTheme";
 
 // Define the shape of our theme context
 interface ThemeContextType {
@@ -36,9 +36,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   };
 
   return (
-    <ThemeContext.Provider value={themeValue}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={themeValue}>{children}</ThemeContext.Provider>
   );
 }
 
@@ -48,10 +46,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
  */
 export function useTheme(): ThemeContextType {
   const context = useContext(ThemeContext);
-  
+
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
-  
+
   return context;
 }

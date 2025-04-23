@@ -15,8 +15,8 @@ import {
  */
 export function useDockIconAnimation(
   mouseX: MotionValue<number>,
-  distanceRange: [number, number, number] = [-150, 0, 150],
-  scaleRange: [number, number, number] = [1, 1.3, 1]
+  distanceRange: number[] = [-150, 0, 150],
+  scaleRange: number[] = [1, 1.3, 1]
 ) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -35,7 +35,7 @@ export function useDockIconAnimation(
   });
 
   // Y position based on scale
-  const ySync = useTransform(scale, [1, scaleRange[1]], [0, -8]);
+  const ySync = useTransform(scale, [1, 1.3], [0, -8]);
   const y = useSpring(ySync, { stiffness: 300, damping: 12 });
 
   return { ref, scale, y };
