@@ -1,28 +1,35 @@
 import { motion } from "framer-motion";
 import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
+import { useTheme } from "../../contexts/ThemeContext";
 
-interface ThemeToggleProps {
-  isDark: boolean;
-  onToggle: () => void;
-}
-
-export default function ThemeToggle({ isDark, onToggle }: ThemeToggleProps) {
+export default function ThemeToggle() {
+  // Get theme from context
+  const { isDark, toggleTheme } = useTheme();
   return (
     <motion.button
-      onClick={onToggle}
-      className="relative p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10"
+      onClick={toggleTheme}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      className="relative p-2 rounded-full hover:bg-black/20 dark:hover:bg-white/20 transition-colors"
       whileTap={{ scale: 0.9 }}
       whileHover={{ scale: 1.1 }}
     >
       <motion.div
         initial={false}
-        animate={{ rotate: isDark ? 180 : 0 }}
-        transition={{ duration: 0.3 }}
+        animate={{
+          rotate: isDark ? 180 : 0,
+          scale: [1, 1.1, 1],
+        }}
+        transition={{
+          duration: 0.5,
+          ease: "easeInOut",
+        }}
+        className="flex items-center justify-center"
       >
         {isDark ? (
-          <MoonIcon className="w-4 h-4 text-gray-200" />
+          <MoonIcon className="w-5 h-5 text-yellow-300" />
         ) : (
-          <SunIcon className="w-4 h-4 text-gray-800" />
+          <SunIcon className="w-5 h-5 text-yellow-500" />
         )}
       </motion.div>
     </motion.button>

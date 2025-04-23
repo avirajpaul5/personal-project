@@ -1,8 +1,11 @@
 // Import necessary dependencies
-import { useState, useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Rnd } from "react-rnd";
 import clsx from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
+import WindowTitleBar from "./WindowTitleBar";
+import { useWindowState } from "../../hooks/useWindowState";
+import { useTheme } from "../../contexts/ThemeContext";
 
 /**
  * Window component props interface
@@ -19,7 +22,6 @@ interface WindowProps {
   y: number;
   onPositionChange: (x: number, y: number) => void;
   style?: React.CSSProperties;
-  isDark: boolean;
   onBodyClick?: () => void;
 }
 
@@ -38,107 +40,46 @@ export default function Window({
   y,
   onPositionChange,
   style,
-  isDark,
   onBodyClick,
 }: WindowProps) {
-  // State for window size and visibility
-  const [size, setSize] = useState({ width: 550, height: 350 });
-  const [isVisible, setIsVisible] = useState(false);
-
-  // Refs for storing previous window state
+  // Get theme from context
+  const { isDark } = useTheme();
+  // Reference to the window element
   const windowRef = useRef<HTMLDivElement>(null);
-  const previousSize = useRef({ width: 550, height: 350 });
-  const previousPosition = useRef({ x: 100, y: 100 });
 
-  // State for exit animation type
-  const [exitType, setExitType] = useState<"close" | "minimize">("close");
+  // Use the window state hook
+  const {
+    size,
+    isVisible,
+    exitType,
+    exitVariants,
+    handleClose: closeWindow,
+    handleMinimize: minimizeWindow,
+    handleMaximize: maximizeWindow,
+    handleDragStop,
+    handleResize,
+  } = useWindowState(
+    { width: 550, height: 350 },
+    { x, y },
+    isOpen,
+    isMaximized,
+    onPositionChange
+  );
 
-  // Effect to set visibility when window is opened
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-    }
-  }, [isOpen]);
-
-  /**
-   * Handle window close action
-   */
+  // Handler functions that call the hook methods with the appropriate callbacks
   const handleClose = () => {
-    if (onBodyClick) {
-      onBodyClick();
-    }
     if (isMaximized) {
       onMaximize();
     }
-    setExitType("close");
-    setIsVisible(false);
+    closeWindow(onBodyClick);
   };
 
-  /**
-   * Handle window minimize action
-   */
   const handleMinimize = () => {
-    if (onBodyClick) {
-      onBodyClick();
-    }
-    setExitType("minimize");
-    setIsVisible(false);
+    minimizeWindow(onBodyClick);
   };
 
-  /**
-   * Handle window maximize/restore action
-   */
   const handleMaximize = () => {
-    if (onBodyClick) {
-      onBodyClick();
-    }
-    if (!isMaximized) {
-      // Store current size and position before maximizing
-      previousSize.current = size;
-      previousPosition.current = { x, y };
-      // Set window size to full screen
-      setSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-      onPositionChange(0, 0);
-    } else {
-      // Restore previous size and position
-      setSize(previousSize.current);
-      onPositionChange(previousPosition.current.x, previousPosition.current.y);
-    }
-    onMaximize();
-  };
-
-  /**
-   * Handle window drag stop event
-   * Ensures the window stays within the viewport
-   */
-  const handleDragStop = (_e: any, d: { x: number; y: number }) => {
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    const newX = Math.max(0, Math.min(d.x, windowWidth - size.width));
-    const newY = Math.max(0, Math.min(d.y, windowHeight - size.height));
-    onPositionChange(newX, newY);
-  };
-
-  // Define exit animation variants
-  const exitVariants = {
-    close: {
-      opacity: 0,
-      scale: 0.95,
-      transition: { duration: 0.3 },
-    },
-    minimize: {
-      y: 100,
-      scale: 0.8,
-      opacity: 0.5,
-      filter: "blur(4px)",
-      transition: {
-        duration: 0.4,
-        ease: [0.68, -0.55, 0.27, 1.55],
-      },
-    },
+    maximizeWindow(onBodyClick, onMaximize);
   };
 
   // Conditional container style for maximized and normal state
@@ -188,13 +129,7 @@ export default function Window({
             }
             position={isMaximized ? { x: 0, y: 0 } : { x, y }}
             onDragStop={handleDragStop}
-            onResize={(_e, _direction, ref, _delta, position) => {
-              setSize({
-                width: parseInt(ref.style.width),
-                height: parseInt(ref.style.height),
-              });
-              onPositionChange(position.x, position.y);
-            }}
+            onResize={handleResize}
             dragHandleClassName="window-handle"
             disableDragging={isMaximized}
             enableResizing={!isMaximized}
@@ -204,7 +139,7 @@ export default function Window({
             <div
               ref={windowRef}
               className={clsx(
-                "flex flex-col backdrop-blur-md rounded-md shadow-md",
+                "flex flex-col backdrop-blur-md rounded-md shadow-md theme-transition",
                 "border w-full h-full overflow-hidden",
                 isDark
                   ? "bg-gray-800/95 border-gray-600"
@@ -213,56 +148,16 @@ export default function Window({
               onClick={onBodyClick}
             >
               {/* Window title bar */}
-              <div
-                className={clsx(
-                  "window-handle flex items-center p-2 border-b",
-                  isDark
-                    ? "bg-gray-700 border-gray-600"
-                    : "bg-gray-100 border-gray-200"
-                )}
-              >
-                {/* Window control buttons */}
-                <div className="flex space-x-2 pl-2">
-                  <button
-                    onClick={handleClose}
-                    className={clsx(
-                      "w-3 h-3 rounded-full transition-colors",
-                      isDark
-                        ? "bg-red-500 hover:bg-red-400"
-                        : "bg-red-500 hover:bg-red-600"
-                    )}
-                  />
-                  <button
-                    onClick={handleMinimize}
-                    className={clsx(
-                      "w-3 h-3 rounded-full transition-colors",
-                      isDark
-                        ? "bg-yellow-500 hover:bg-yellow-400"
-                        : "bg-yellow-500 hover:bg-yellow-600"
-                    )}
-                  />
-                  <button
-                    onClick={handleMaximize}
-                    className={clsx(
-                      "w-3 h-3 rounded-full transition-colors",
-                      isDark
-                        ? "bg-green-500 hover:bg-green-400"
-                        : "bg-green-500 hover:bg-green-600"
-                    )}
-                  />
-                </div>
-                {/* Window title */}
-                <span
-                  className={clsx(
-                    "flex-1 text-center text-xs font-medium",
-                    isDark ? "text-gray-200" : "text-gray-700"
-                  )}
-                >
-                  {title}
-                </span>
-              </div>
+              <WindowTitleBar
+                title={title}
+                onClose={handleClose}
+                onMinimize={handleMinimize}
+                onMaximize={handleMaximize}
+              />
               {/* Window content */}
-              <div className="flex-1 overflow-auto p-2">{children}</div>
+              <div className="flex-1 overflow-auto p-2 text-theme">
+                {children}
+              </div>
             </div>
           </Rnd>
         </motion.div>

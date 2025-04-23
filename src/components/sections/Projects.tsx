@@ -34,14 +34,14 @@ export default function Projects() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   return (
-    <div className="relative min-h-screen bg-white/90 dark:bg-gray-900/80 p-6 md:p-10">
+    <div className="relative min-h-screen bg-white dark:bg-gray-900 p-6 md:p-10">
       {/* Top "Finder" Title Bar */}
-      <div className="bg-gray-200/50 dark:bg-gray-700/50 rounded-t-md h-10 flex items-center px-4 mb-4">
-        <p className="text-sm dark:text-gray-300">Projects</p>
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-t-md h-10 flex items-center px-4 mb-4">
+        <p className="text-sm text-theme">Projects</p>
       </div>
 
       {/* Page Title */}
-      <h2 className="text-3xl font-bold mb-6 flex items-center gap-2 dark:text-white">
+      <h2 className="text-3xl font-bold mb-6 flex items-center gap-2 text-theme">
         <Folder size={30} className="text-yellow-400" />
         <span>My Projects</span>
       </h2>
@@ -53,13 +53,11 @@ export default function Projects() {
             key={project.id}
             onClick={() => setSelectedProject(project)}
             className="cursor-pointer flex flex-col items-center justify-center 
-                      bg-gray-100/50 dark:bg-white/10 rounded-md p-6 
-                      hover:bg-gray-200/50 dark:hover:bg-white/20 transition"
+                      bg-gray-50 dark:bg-gray-800 rounded-md p-6 
+                      hover-theme theme-transition"
           >
             <Folder size={48} className="text-yellow-400 mb-2" />
-            <p className="text-lg font-semibold dark:text-white">
-              {project.title}
-            </p>
+            <p className="text-lg font-semibold text-theme">{project.title}</p>
           </div>
         ))}
       </div>

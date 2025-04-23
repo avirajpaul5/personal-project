@@ -13,12 +13,13 @@ import Terminal from "./components/sections/Terminal";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 
-// Define background images for light and dark modes
-const BACKGROUNDS = {
-  light:
-    "url('https://images.unsplash.com/photo-1604147495798-57beb5d6af73?q=80&w=2000')",
-  dark: "url('https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=2000')",
-};
+// Import custom hooks
+import { useWindowManager } from "./hooks/useWindowManager";
+import { useTerminal } from "./hooks/useTerminal";
+import { useSpotlight } from "./hooks/useSpotlight";
+
+// Import ThemeProvider and useTheme hook from our new context
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 
 // Define initial state for app windows
 const initialApps: WindowType[] = [
@@ -97,12 +98,30 @@ const initialApps: WindowType[] = [
 ];
 
 // Main App component
-function App() {
-  // State hooks for managing app state
-  const [apps, setApps] = useState<WindowType[]>(initialApps);
-  const [isDark, setIsDark] = useState(false);
+function AppContent() {
+  // State for loading screen
   const [loading, setLoading] = useState(true);
-  const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
+
+  // Use custom hooks
+  const { isDark, toggleTheme, backgrounds } = useTheme();
+  const {
+    isOpen: isSpotlightOpen,
+    openSpotlight,
+    closeSpotlight,
+  } = useSpotlight();
+  const {
+    windows,
+    openWindow,
+    minimizeWindow,
+    minimizeAndCloseWindow,
+    restoreWindow,
+    closeWindow,
+    closeWindowCompletely,
+    toggleMaximize,
+    updatePosition,
+    focusWindow,
+  } = useWindowManager(initialApps);
+  const { processCommand } = useTerminal(openWindow);
 
   // Effect hook for initial loading
   useEffect(() => {
@@ -113,161 +132,6 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Effect hook for managing dark mode
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDark]);
-
-  // Effect hook for spotlight search keyboard shortcut
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setIsSpotlightOpen(true);
-      }
-    };
-
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, []);
-
-  // Handler for app click events
-  const handleAppClick = (id: string) => {
-    setApps((prevApps) =>
-      prevApps.map((app) => {
-        if (app.id === id) {
-          // Calculate staggered position based on number of open apps
-          const openApps = prevApps.filter((a) => a.isOpen && !a.isMinimized);
-          const offset = openApps.length * 30;
-          return {
-            ...app,
-            isOpen: true,
-            isMinimized: false,
-            x: 100 + offset,
-            y: 100 + offset,
-            lastActive: Date.now(),
-          };
-        }
-        return app;
-      })
-    );
-  };
-
-  // Handler for minimizing apps
-  const onMinimizeApp = (id: string) => {
-    setApps((prev) =>
-      prev.map((app) =>
-        app.id === id ? { ...app, isMinimized: true, isOpen: false } : app
-      )
-    );
-  };
-
-  // Handler for restoring minimized apps
-  const onRestoreApp = (id: string) => {
-    setApps((prevApps) =>
-      prevApps.map((app) =>
-        app.id === id
-          ? {
-              ...app,
-              isMinimized: false,
-              isOpen: true,
-              lastActive: Date.now(),
-            }
-          : app
-      )
-    );
-  };
-
-  // Handler for closing apps
-  const handleClose = (id: string) => {
-    setApps((prevApps) =>
-      prevApps.map((app) => (app.id === id ? { ...app, isOpen: false } : app))
-    );
-  };
-
-  // Handler for closing apps from the dock
-  const handleCloseApp = (id: string) => {
-    setApps((prevApps) =>
-      prevApps.map((app) =>
-        app.id === id ? { ...app, isOpen: false, isMinimized: false } : app
-      )
-    );
-  };
-
-  // Handler for minimizing apps
-  const handleMinimize = (id: string) => {
-    setApps((prevApps) =>
-      prevApps.map((app) =>
-        app.id === id ? { ...app, isMinimized: true } : app
-      )
-    );
-  };
-
-  // Handler for maximizing apps
-  const handleMaximize = (id: string) => {
-    setApps((prevApps) =>
-      prevApps.map((app) => {
-        if (app.id === id) {
-          // Bring window to front when maximizing
-          const isMaximizing = !app.isMaximized;
-          return {
-            ...app,
-            isMaximized: !app.isMaximized,
-            lastActive: Date.now(),
-            // Store original position/size only when maximizing
-            ...(isMaximizing
-              ? {
-                  x: app.x,
-                  y: app.y,
-                  width: 600,
-                  height: 400,
-                }
-              : {}),
-          };
-        }
-        return app;
-      })
-    );
-  };
-
-  // Handler for changing app window position
-  const handlePositionChange = (id: string, newX: number, newY: number) => {
-    setApps((prevApps) =>
-      prevApps.map((app) =>
-        app.id === id ? { ...app, x: newX, y: newY } : app
-      )
-    );
-  };
-
-  // Function to process terminal commands
-  const processTerminalCommand = (command: string): string => {
-    switch (command) {
-      case "whoami":
-        return "A passionate developer who loves creating beautiful interfaces";
-      case "ls projects":
-        return "Project 1\nProject 2\nProject 3";
-      case "open contact":
-        handleAppClick("contact");
-        return "Opening contact...";
-      case "help":
-        return "Available commands:\nwhoami - About me\nls projects - List projects\nopen contact - Open contact window";
-      default:
-        return `Command not found: ${command}`;
-    }
-  };
-
-  const handleWindowFocus = (id: string) => {
-    setApps((prevApps) =>
-      prevApps.map((app) =>
-        app.id === id ? { ...app, lastActive: Date.now() } : app
-      )
-    );
-  };
-
   // Render the main app component
   return (
     <div
@@ -276,9 +140,10 @@ function App() {
         isDark ? "dark" : "light"
       )}
       style={{
-        backgroundImage: isDark ? BACKGROUNDS.dark : BACKGROUNDS.light,
+        backgroundImage: isDark ? backgrounds.dark : backgrounds.light,
         backgroundSize: "cover",
         backgroundPosition: "center",
+        backgroundColor: isDark ? "#111827" : "#ffffff",
       }}
     >
       {loading ? (
@@ -290,15 +155,14 @@ function App() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <Navbar isDark={isDark} onThemeToggle={() => setIsDark(!isDark)} />
+          <Navbar />
           <SpotlightSearch
             isOpen={isSpotlightOpen}
-            onClose={() => setIsSpotlightOpen(false)}
-            onAppClick={handleAppClick}
-            isDark={isDark}
+            onClose={closeSpotlight}
+            onAppClick={openWindow}
           />
           <div className="relative w-full h-full pt-7">
-            {apps
+            {windows
               .filter((app) => app.isOpen && !app.isMinimized) // Only show open and non-minimized apps
               .sort((a, b) => a.lastActive - b.lastActive) // Sort by lastActive (oldest first)
               .map((app, index) => {
@@ -309,22 +173,21 @@ function App() {
                   return (
                     <Window
                       key={app.id}
-                      isDark={isDark}
                       title={app.title}
                       isOpen={app.isOpen && !app.isMinimized}
                       isMaximized={app.isMaximized}
                       x={app.x}
                       y={app.y}
                       onPositionChange={(newX, newY) =>
-                        handlePositionChange(app.id, newX, newY)
+                        updatePosition(app.id, newX, newY)
                       }
-                      onClose={() => handleClose(app.id)}
-                      onMinimize={() => handleMinimize(app.id)}
-                      onMaximize={() => handleMaximize(app.id)}
-                      onBodyClick={() => handleWindowFocus(app.id)}
+                      onClose={() => closeWindow(app.id)}
+                      onMinimize={() => minimizeWindow(app.id)}
+                      onMaximize={() => toggleMaximize(app.id)}
+                      onBodyClick={() => focusWindow(app.id)}
                       style={{ zIndex }}
                     >
-                      <Terminal onCommand={processTerminalCommand} />
+                      <Terminal onCommand={processCommand} />
                     </Window>
                   );
                 }
@@ -334,19 +197,18 @@ function App() {
                 return (
                   <Window
                     key={app.id}
-                    isDark={isDark}
                     title={app.title}
                     isOpen={app.isOpen}
                     isMaximized={app.isMaximized}
                     x={app.x}
                     y={app.y}
                     onPositionChange={(newX, newY) =>
-                      handlePositionChange(app.id, newX, newY)
+                      updatePosition(app.id, newX, newY)
                     }
-                    onClose={() => handleClose(app.id)}
-                    onMinimize={() => handleMinimize(app.id)}
-                    onMaximize={() => handleMaximize(app.id)}
-                    onBodyClick={() => handleWindowFocus(app.id)}
+                    onClose={() => closeWindow(app.id)}
+                    onMinimize={() => minimizeWindow(app.id)}
+                    onMaximize={() => toggleMaximize(app.id)}
+                    onBodyClick={() => focusWindow(app.id)}
                     style={{ zIndex }}
                   >
                     <AppComponent />
@@ -355,16 +217,24 @@ function App() {
               })}
           </div>
           <Dock
-            apps={apps}
-            isDark={isDark}
-            onAppClick={handleAppClick}
-            onMinimizeApp={onMinimizeApp}
-            onRestoreApp={onRestoreApp}
-            onCloseApp={handleCloseApp}
+            apps={windows}
+            onAppClick={openWindow}
+            onMinimizeApp={minimizeAndCloseWindow}
+            onRestoreApp={restoreWindow}
+            onCloseApp={closeWindowCompletely}
           />
         </motion.div>
       )}
     </div>
+  );
+}
+
+// Wrapper component that provides the theme context
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 

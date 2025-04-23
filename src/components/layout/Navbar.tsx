@@ -3,14 +3,11 @@ import ThemeToggle from "../common/ThemeToggle";
 import NotificationCenter from "../notifications/NotificationCenter";
 import AppleMenu from "../common/AppleMenu";
 import clsx from "clsx";
+import { useTheme } from "../../contexts/ThemeContext";
 
-export default function Navbar({
-  isDark,
-  onThemeToggle,
-}: {
-  isDark: boolean;
-  onThemeToggle: () => void;
-}) {
+export default function Navbar() {
+  // Get theme values from context
+  const { isDark, toggleTheme } = useTheme();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isNotificationCenterOpen, setIsNotificationCenterOpen] =
     useState(false);
@@ -53,7 +50,7 @@ export default function Navbar({
         Aviraj Paul
       </button>
       <div className="flex items-center space-x-4">
-        <ThemeToggle isDark={isDark} onToggle={onThemeToggle} />
+        <ThemeToggle />
         <button
           onClick={() => setIsNotificationCenterOpen(true)}
           className={clsx(
@@ -67,7 +64,6 @@ export default function Navbar({
       <AppleMenu
         isOpen={isAppleMenuOpen}
         onClose={() => setIsAppleMenuOpen(false)}
-        isDark={isDark}
       />
       <NotificationCenter
         isOpen={isNotificationCenterOpen}

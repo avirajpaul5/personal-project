@@ -5,19 +5,16 @@ import {
   StickyNote,
   Rocket,
   Lightbulb,
-  Bot as Lotus,
-  Target,
   Glasses,
-  Terminal,
   LogOut,
 } from "lucide-react";
 import { useEffect, useRef } from "react";
 import clsx from "clsx";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface AppleMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  isDark: boolean;
 }
 
 const menuItems = [
@@ -26,10 +23,7 @@ const menuItems = [
   { id: "notes", label: "Notes to Self", icon: StickyNote },
   { id: "shipped", label: "Recently Shipped", icon: Rocket },
   { id: "creative", label: "Restart Creative Flow", icon: Lightbulb },
-  { id: "focus", label: "Focus Mode", icon: Lotus },
-  { id: "zen", label: "System Zen", icon: Target },
   { id: "stealth", label: "Stealth Mode", icon: Glasses },
-  { id: "terminal", label: "Lock Terminal", icon: Terminal },
   { id: "exit", label: "Exit AvirajOS", icon: LogOut },
 ];
 
@@ -83,7 +77,9 @@ const itemAnimation = {
   }),
 };
 
-export default function AppleMenu({ isOpen, onClose, isDark }: AppleMenuProps) {
+export default function AppleMenu({ isOpen, onClose }: AppleMenuProps) {
+  // Get theme from context
+  const { isDark } = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

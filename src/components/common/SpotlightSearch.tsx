@@ -9,12 +9,12 @@ import {
   EnvelopeIcon,
   CommandLineIcon,
 } from "@heroicons/react/24/outline";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface SpotlightSearchProps {
   isOpen: boolean;
   onClose: () => void;
   onAppClick: (id: string) => void;
-  isDark: boolean;
 }
 
 const searchItems = [
@@ -48,8 +48,9 @@ export default function SpotlightSearch({
   isOpen,
   onClose,
   onAppClick,
-  isDark,
 }: SpotlightSearchProps) {
+  // Get theme from context
+  const { isDark } = useTheme();
   const [search, setSearch] = useState("");
 
   useEffect(() => {
