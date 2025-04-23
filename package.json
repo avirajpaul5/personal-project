@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -10,7 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@heroicons/react": "^2.1.1",
+    "@heroicons/react": "^2.2.0",
     "@types/spotify-web-playback-sdk": "^0.1.19",
     "clsx": "^2.0.0",
     "cmdk": "^1.1.1",
@@ -34,8 +37,11 @@
     "globals": "^16.0.0",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",
-    "typescript": "~5.7.2",
+    "typescript": "^5.3.3",
     "typescript-eslint": "^8.26.0",
     "vite": "^6.2.6"
+  },
+  "overrides": {
+    "esbuild": "0.25.1"
   }
 }
