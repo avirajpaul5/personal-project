@@ -4,14 +4,22 @@ import NotificationCenter from "../notifications/NotificationCenter";
 import AppleMenu from "../common/AppleMenu";
 import clsx from "clsx";
 import { useTheme } from "../../contexts/ThemeContext";
+import { Search, Battery, Wifi, LayoutGrid } from "lucide-react";
+import { useSpotlight } from "../../contexts/SpotlightContext";
 
 export default function Navbar() {
   // Get theme values from context
   const { isDark } = useTheme();
+  const { openSpotlight } = useSpotlight();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isNotificationCenterOpen, setIsNotificationCenterOpen] =
     useState(false);
   const [isAppleMenuOpen, setIsAppleMenuOpen] = useState(false);
+
+  // Status menu states for future functionality
+  const [isBatteryMenuOpen, setIsBatteryMenuOpen] = useState(false);
+  const [isWifiMenuOpen, setIsWifiMenuOpen] = useState(false);
+  const [isControlCenterOpen, setIsControlCenterOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -50,6 +58,55 @@ export default function Navbar() {
         Aviraj Paul
       </button>
       <div className="flex items-center space-x-4">
+        {/* Status Icons */}
+        <div className="flex items-center space-x-2 mr-2">
+          <button
+            onClick={() => setIsBatteryMenuOpen(true)}
+            className={clsx(
+              "hover:bg-opacity-20 p-1 rounded transition-colors flex items-center justify-center",
+              isDark ? "hover:bg-white" : "hover:bg-black"
+            )}
+            aria-label="Battery Status"
+            title="Battery Status"
+          >
+            <Battery className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setIsWifiMenuOpen(true)}
+            className={clsx(
+              "hover:bg-opacity-20 p-1 rounded transition-colors flex items-center justify-center",
+              isDark ? "hover:bg-white" : "hover:bg-black"
+            )}
+            aria-label="WiFi Status"
+            title="WiFi Status"
+          >
+            <Wifi className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setIsControlCenterOpen(true)}
+            className={clsx(
+              "hover:bg-opacity-20 p-1 rounded transition-colors flex items-center justify-center",
+              isDark ? "hover:bg-white" : "hover:bg-black"
+            )}
+            aria-label="Control Center"
+            title="Control Center"
+          >
+            <LayoutGrid className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Search and Theme */}
+        <button
+          onClick={openSpotlight}
+          className={clsx(
+            "hover:bg-opacity-20 p-1 rounded transition-colors flex items-center justify-center",
+            isDark ? "hover:bg-white" : "hover:bg-black"
+          )}
+          aria-label="Spotlight Search"
+          title="Spotlight Search"
+        >
+          <Search className="w-4 h-4" />
+        </button>
         <ThemeToggle />
         <button
           onClick={() => setIsNotificationCenterOpen(true)}
@@ -61,6 +118,7 @@ export default function Navbar() {
           {formatDate(currentTime)}
         </button>
       </div>
+      {/* Menus */}
       <AppleMenu
         isOpen={isAppleMenuOpen}
         onClose={() => setIsAppleMenuOpen(false)}
@@ -69,6 +127,14 @@ export default function Navbar() {
         isOpen={isNotificationCenterOpen}
         onClose={() => setIsNotificationCenterOpen(false)}
       />
+
+      {/* Placeholder for future menu components */}
+      {/*
+        Future components to add:
+        <BatteryMenu isOpen={isBatteryMenuOpen} onClose={() => setIsBatteryMenuOpen(false)} />
+        <WifiMenu isOpen={isWifiMenuOpen} onClose={() => setIsWifiMenuOpen(false)} />
+        <ControlCenter isOpen={isControlCenterOpen} onClose={() => setIsControlCenterOpen(false)} />
+      */}
     </div>
   );
 }

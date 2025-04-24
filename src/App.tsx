@@ -17,11 +17,12 @@ import clsx from "clsx";
 // Import custom hooks
 import { useWindowManager } from "./hooks/useWindowManager";
 import { useTerminal } from "./hooks/useTerminal";
-import { useSpotlight } from "./hooks/useSpotlight";
 import { useLaunchpad } from "./hooks/useLaunchpad";
 
 // Import ThemeProvider and useTheme hook from our new context
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
+// Import SpotlightProvider
+import { SpotlightProvider, useSpotlight } from "./contexts/SpotlightContext";
 
 // Define initial state for app windows
 const initialApps: WindowType[] = [
@@ -244,7 +245,9 @@ function AppContent() {
 function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <SpotlightProvider>
+        <AppContent />
+      </SpotlightProvider>
     </ThemeProvider>
   );
 }
