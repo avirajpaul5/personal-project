@@ -4,6 +4,7 @@ import { Window } from "../utils/types";
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import DockIcon from "./DockIcon";
+import LaunchpadIcon from "./LaunchpadIcon";
 import MinimizedDockIcon, { MinimizedDockIconProps } from "./MinimizedDockIcon";
 import { useDockMouseTracking } from "../../hooks/useDockAnimation";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -16,6 +17,7 @@ interface DockProps {
   onMinimizeApp: (id: string) => void;
   onRestoreApp: (id: string) => void;
   onCloseApp: (id: string) => void;
+  onLaunchpadClick: () => void;
 }
 
 // Main Dock component
@@ -25,6 +27,7 @@ export default function Dock({
   onMinimizeApp,
   onRestoreApp,
   onCloseApp,
+  onLaunchpadClick,
 }: DockProps) {
   // Get theme from context
   const { isDark } = useTheme();
@@ -53,6 +56,21 @@ export default function Dock({
             : "bg-white/30 border border-gray-300/50"
         )}
       >
+        {/* Launchpad Icon */}
+        <LaunchpadIcon
+          mouseX={mouseX}
+          isDark={isDark}
+          onClick={onLaunchpadClick}
+        />
+
+        {/* Divider after Launchpad */}
+        <div
+          className={clsx(
+            "w-px h-9 mx-3",
+            isDark ? "bg-gray-600" : "bg-gray-300"
+          )}
+        />
+
         {/* Open Apps Section */}
         <div className="flex items-end space-x-3">
           {apps

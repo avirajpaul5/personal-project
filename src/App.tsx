@@ -9,6 +9,7 @@ import Projects from "./components/sections/Projects";
 import Contact from "./components/sections/Contact";
 import MacOSPreloader from "./components/common/Preloader";
 import SpotlightSearch from "./components/common/SpotlightSearch";
+import Launchpad from "./components/common/Launchpad";
 import Terminal from "./components/sections/Terminal";
 import { motion } from "framer-motion";
 import clsx from "clsx";
@@ -17,6 +18,7 @@ import clsx from "clsx";
 import { useWindowManager } from "./hooks/useWindowManager";
 import { useTerminal } from "./hooks/useTerminal";
 import { useSpotlight } from "./hooks/useSpotlight";
+import { useLaunchpad } from "./hooks/useLaunchpad";
 
 // Import ThemeProvider and useTheme hook from our new context
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
@@ -106,6 +108,12 @@ function AppContent() {
   const { isDark, backgrounds } = useTheme();
   const { isOpen: isSpotlightOpen, closeSpotlight } = useSpotlight();
   const {
+    isOpen: isLaunchpadOpen,
+    openLaunchpad,
+    closeLaunchpad,
+    toggleLaunchpad,
+  } = useLaunchpad();
+  const {
     windows,
     openWindow,
     minimizeWindow,
@@ -155,6 +163,12 @@ function AppContent() {
           <SpotlightSearch
             isOpen={isSpotlightOpen}
             onClose={closeSpotlight}
+            onAppClick={openWindow}
+          />
+          <Launchpad
+            isOpen={isLaunchpadOpen}
+            onClose={closeLaunchpad}
+            apps={windows}
             onAppClick={openWindow}
           />
           <div className="relative w-full h-full pt-7">
@@ -218,6 +232,7 @@ function AppContent() {
             onMinimizeApp={minimizeAndCloseWindow}
             onRestoreApp={restoreWindow}
             onCloseApp={closeWindowCompletely}
+            onLaunchpadClick={toggleLaunchpad}
           />
         </motion.div>
       )}
