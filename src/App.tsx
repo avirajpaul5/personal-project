@@ -11,6 +11,7 @@ import MacOSPreloader from "./components/common/Preloader";
 import SpotlightSearch from "./components/common/SpotlightSearch";
 import Launchpad from "./components/common/Launchpad";
 import Terminal from "./components/sections/Terminal";
+import WallpaperSelector from "./components/sections/WallpaperSelector";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 
@@ -98,6 +99,20 @@ const initialApps: WindowType[] = [
     lastActive: 0,
     component: () => null,
   },
+  // Wallpaper Selector app configuration
+  {
+    id: "wallpaper-selector",
+    title: "Wallpaper Selector",
+    icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzQyODVmNCIgZD0iTTIxIDNIM2MtMS4xIDAtMiAuOS0yIDJ2MTRjMCAxLjEuOSAyIDIgMmgxOGMxLjEgMCAyLS45IDItMlY1YzAtMS4xLS45LTItMi0yem0wIDE2SDNWNWgxOHYxNHptLTEwLTcuNWMwIC44My0uNjcgMS41LTEuNSAxLjVTOCAxMS4zMyA4IDEwLjVTOC42NyA5IDkuNSA5czEuNS42NyAxLjUgMS41ek0xMiAxNGg3djJoLTd2LTJ6Ii8+PC9zdmc+",
+    isOpen: false,
+    isMaximized: false,
+    isMinimized: false,
+    x: 150,
+    y: 150,
+    lastActive: 0,
+    component: WallpaperSelector,
+    showInDock: false, // Hide from dock but keep in Launchpad
+  },
 ];
 
 // Main App component
@@ -106,7 +121,7 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
 
   // Use custom hooks
-  const { isDark, backgrounds } = useTheme();
+  const { isDark, currentWallpaper } = useTheme();
   const { isOpen: isSpotlightOpen, closeSpotlight } = useSpotlight();
   const {
     isOpen: isLaunchpadOpen,
@@ -145,7 +160,7 @@ function AppContent() {
         isDark ? "dark" : "light"
       )}
       style={{
-        backgroundImage: isDark ? backgrounds.dark : backgrounds.light,
+        backgroundImage: currentWallpaper,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundColor: isDark ? "#111827" : "#ffffff",
@@ -160,7 +175,7 @@ function AppContent() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <Navbar />
+          <Navbar openWindow={openWindow} />
           <SpotlightSearch
             isOpen={isSpotlightOpen}
             onClose={closeSpotlight}

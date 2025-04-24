@@ -39,8 +39,10 @@ export default function Dock({
   // Use the dock mouse tracking hook
   const { mouseX, handleMouseMove, handleMouseLeave } = useDockMouseTracking();
 
-  // Filter minimized apps
-  const minimizedApps = apps.filter((app) => app.isMinimized);
+  // Filter minimized apps that should be shown in dock
+  const minimizedApps = apps.filter(
+    (app) => app.isMinimized && app.showInDock !== false
+  );
 
   return (
     <div className="relative w-full flex justify-center">
@@ -74,7 +76,7 @@ export default function Dock({
         {/* Open Apps Section */}
         <div className="flex items-end space-x-3">
           {apps
-            .filter((app) => !app.isMinimized)
+            .filter((app) => !app.isMinimized && app.showInDock !== false)
             .map((app) => (
               <DockIcon
                 key={app.id}

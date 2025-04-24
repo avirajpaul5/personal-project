@@ -7,7 +7,11 @@ import { useTheme } from "../../contexts/ThemeContext";
 import { Search, Battery, Wifi, LayoutGrid } from "lucide-react";
 import { useSpotlight } from "../../contexts/SpotlightContext";
 
-export default function Navbar() {
+interface NavbarProps {
+  openWindow: (id: string) => void;
+}
+
+export default function Navbar({ openWindow }: NavbarProps) {
   // Get theme values from context
   const { isDark } = useTheme();
   const { openSpotlight } = useSpotlight();
@@ -122,6 +126,7 @@ export default function Navbar() {
       <AppleMenu
         isOpen={isAppleMenuOpen}
         onClose={() => setIsAppleMenuOpen(false)}
+        openWindow={openWindow}
       />
       <NotificationCenter
         isOpen={isNotificationCenterOpen}

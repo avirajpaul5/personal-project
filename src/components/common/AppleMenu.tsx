@@ -5,10 +5,10 @@ import {
   StickyNote,
   Rocket,
   Lightbulb,
-  Glasses,
+  Image,
   LogOut,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { useTheme } from "../../contexts/ThemeContext";
 
@@ -23,7 +23,7 @@ const menuItems = [
   { id: "notes", label: "Notes to Self", icon: StickyNote },
   { id: "shipped", label: "Recently Shipped", icon: Rocket },
   { id: "creative", label: "Restart Creative Flow", icon: Lightbulb },
-  { id: "stealth", label: "Stealth Mode", icon: Glasses },
+  { id: "wallpaper", label: "Change Wallpaper", icon: Image },
   { id: "exit", label: "Exit AvirajOS", icon: LogOut },
 ];
 
@@ -77,10 +77,26 @@ const itemAnimation = {
   }),
 };
 
-export default function AppleMenu({ isOpen, onClose }: AppleMenuProps) {
+interface AppleMenuWithWindowProps extends AppleMenuProps {
+  openWindow?: (id: string) => void;
+}
+
+export default function AppleMenu({
+  isOpen,
+  onClose,
+  openWindow,
+}: AppleMenuWithWindowProps) {
   // Get theme from context
   const { isDark } = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Function to open wallpaper selector
+  const handleWallpaperChange = () => {
+    if (openWindow) {
+      openWindow("wallpaper-selector");
+      onClose();
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -156,6 +172,11 @@ export default function AppleMenu({ isOpen, onClose }: AppleMenuProps) {
                     initial="initial"
                     animate="animate"
                     exit="exit"
+                    onClick={() => {
+                      if (item.id === "wallpaper") {
+                        handleWallpaperChange();
+                      }
+                    }}
                     whileHover={{
                       backgroundColor: isDark
                         ? "rgba(255,255,255,0.1)"

@@ -10,6 +10,8 @@ interface ThemeContextType {
     light: string;
     dark: string;
   };
+  currentWallpaper: string;
+  setWallpaper: (wallpaper: string) => void;
 }
 
 // Create the context with a default value
@@ -25,7 +27,8 @@ interface ThemeProviderProps {
  */
 export function ThemeProvider({ children }: ThemeProviderProps) {
   // Use the existing theme hook
-  const { isDark, toggleTheme, setTheme } = useThemeHook();
+  const { isDark, toggleTheme, setTheme, currentWallpaper, setWallpaper } =
+    useThemeHook();
 
   // Create the value object to be provided by the context
   const themeValue: ThemeContextType = {
@@ -33,6 +36,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     toggleTheme,
     setTheme,
     backgrounds: BACKGROUNDS,
+    currentWallpaper,
+    setWallpaper,
   };
 
   return (

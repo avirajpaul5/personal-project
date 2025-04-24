@@ -11,6 +11,8 @@ export const BACKGROUNDS = {
 
 // Theme storage key for localStorage
 const THEME_STORAGE_KEY = "portfolio-theme-preference";
+// Wallpaper storage key for localStorage
+const WALLPAPER_STORAGE_KEY = "portfolio-wallpaper-preference";
 
 /**
  * Check if the user prefers dark mode based on system preference
@@ -38,6 +40,17 @@ export function useTheme() {
     return getSystemThemePreference();
   });
 
+  // Initialize wallpaper from localStorage or default based on theme
+  const [currentWallpaper, setCurrentWallpaper] = useState(() => {
+    // Check localStorage first
+    const savedWallpaper = localStorage.getItem(WALLPAPER_STORAGE_KEY);
+    if (savedWallpaper !== null) {
+      return savedWallpaper;
+    }
+    // Default to theme-appropriate wallpaper
+    return isDark ? BACKGROUNDS.dark : BACKGROUNDS.light;
+  });
+
   // Effect hook for managing dark mode
   useEffect(() => {
     // Apply theme to document
@@ -52,6 +65,11 @@ export function useTheme() {
     // Save preference to localStorage
     localStorage.setItem(THEME_STORAGE_KEY, isDark ? "dark" : "light");
   }, [isDark]);
+
+  // Effect hook for saving wallpaper preference
+  useEffect(() => {
+    localStorage.setItem(WALLPAPER_STORAGE_KEY, currentWallpaper);
+  }, [currentWallpaper]);
 
   // Listen for system preference changes
   useEffect(() => {
@@ -82,5 +100,10 @@ export function useTheme() {
    */
   const setTheme = (dark: boolean) => setIsDark(dark);
 
-  return { isDark, toggleTheme, setTheme };
+  /**
+   * Set wallpaper explicitly
+   */
+  const setWallpaper = (wallpaper: string) => setCurrentWallpaper(wallpaper);
+
+  return { isDark, toggleTheme, setTheme, currentWallpaper, setWallpaper };
 }
