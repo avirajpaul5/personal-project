@@ -23,7 +23,7 @@ export default function Launchpad({
 
   // State for pagination
   const [currentPage, setCurrentPage] = useState(0);
-  const appsPerPage = 28; // 7 columns x 4 rows
+  const appsPerPage = 32; // 8 columns x 4 rows
   const totalPages = Math.ceil(apps.length / appsPerPage);
 
   // Handle Escape key to close Launchpad
@@ -101,13 +101,8 @@ export default function Launchpad({
                 className="app-icon-container"
                 onClick={(e) => handleAppClick(app.id, e)}
               >
-                <div
-                  className={clsx(
-                    "app-icon",
-                    isDark ? "bg-gray-800/80" : "bg-white/80"
-                  )}
-                >
-                  <img src={app.icon} alt={app.title} />
+                <div className="app-icon">
+                  <img src={app.icon} alt={app.title} className="w-12 h-12 mt-6" />
                 </div>
                 <span className="app-title">{app.title}</span>
               </motion.div>

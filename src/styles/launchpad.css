@@ -15,9 +15,9 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(5, 1fr);
-  gap: 40px;
+  gap: 45px;
   width: 100%;
-  max-width: 900px;
+  max-width: 950px;
   padding: 20px;
   margin: 0 auto;
   margin-top: 60px;
@@ -37,20 +37,17 @@
 }
 
 .app-icon {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 15px;
-  background-color: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 8px;
 }
 
 .app-icon img {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
 }
 

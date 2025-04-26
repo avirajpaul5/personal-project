@@ -40,25 +40,11 @@ export default function LaunchpadIcon({
           "relative p-2 rounded-lg flex flex-col items-center top-1 pb-3"
         )}
       >
-        <div
-          className={clsx(
-            "w-9 h-9 flex items-center justify-center rounded-lg",
-            isDark ? "bg-gray-800" : "bg-white/90"
-          )}
-        >
-          {/* Custom Launchpad icon grid */}
-          <div className="grid grid-cols-3 gap-0.5">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <div
-                key={i}
-                className={clsx(
-                  "w-1.5 h-1.5 rounded-sm",
-                  isDark ? "bg-white/90" : "bg-gray-800/90"
-                )}
-              />
-            ))}
-          </div>
-        </div>
+        <img
+          src="/assets/launchpad icon.png"
+          alt="Launchpad"
+          className="w-12 h-12"
+        />
         {/* Tooltip */}
         <div
           className={clsx(

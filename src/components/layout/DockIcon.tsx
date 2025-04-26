@@ -50,7 +50,7 @@ export default function DockIcon({
         <img
           src={app.icon}
           alt={app.title}
-          className="w-9 h-9 transform transition-transform duration-200"
+          className="w-12 h-12 transform transition-transform duration-200"
         />
         {/* Tooltip */}
         <div
