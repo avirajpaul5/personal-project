@@ -7,6 +7,8 @@ import {
   Lightbulb,
   Image,
   LogOut,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
@@ -17,13 +19,18 @@ interface AppleMenuProps {
   onClose: () => void;
 }
 
-const menuItems = [
+const getMenuItems = (isDark: boolean) => [
   { id: "now-playing", label: "Now Playing in Life", icon: Headphones },
   { id: "dev-lab", label: "Dev Lab", icon: Flask },
   { id: "notes", label: "Notes to Self", icon: StickyNote },
   { id: "shipped", label: "Recently Shipped", icon: Rocket },
   { id: "creative", label: "Restart Creative Flow", icon: Lightbulb },
   { id: "wallpaper", label: "Change Wallpaper", icon: Image },
+  {
+    id: "theme",
+    label: isDark ? "Switch to Light Mode" : "Switch to Dark Mode",
+    icon: isDark ? Sun : Moon,
+  },
   { id: "exit", label: "Exit AvirajOS", icon: LogOut },
 ];
 
@@ -87,7 +94,7 @@ export default function AppleMenu({
   openWindow,
 }: AppleMenuWithWindowProps) {
   // Get theme from context
-  const { isDark } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Function to open wallpaper selector
@@ -144,11 +151,10 @@ export default function AppleMenu({
             animate="animate"
             exit="exit"
             className={clsx(
-              "fixed top-7 left-4 z-50 w-72 rounded-lg shadow-xl overflow-hidden",
+              "fixed top-7 left-4 z-50 w-72 rounded-lg shadow-xl overflow-hidden backdrop-blur-xl",
               isDark
                 ? "bg-gray-800/90 shadow-black/20"
-                : "bg-white/90 shadow-black/10",
-              "backdrop-blur-xl"
+                : "bg-white/90 shadow-black/10"
             )}
           >
             <div className="p-1">
@@ -164,7 +170,7 @@ export default function AppleMenu({
                 AvirajOS
               </motion.div>
               <div className="py-1">
-                {menuItems.map((item, index) => (
+                {getMenuItems(isDark).map((item, index, items) => (
                   <motion.button
                     key={item.id}
                     custom={index}
@@ -175,6 +181,9 @@ export default function AppleMenu({
                     onClick={() => {
                       if (item.id === "wallpaper") {
                         handleWallpaperChange();
+                      } else if (item.id === "theme") {
+                        toggleTheme();
+                        onClose();
                       }
                     }}
                     whileHover={{
@@ -187,8 +196,8 @@ export default function AppleMenu({
                     className={clsx(
                       "w-full px-3 py-2 flex items-center space-x-3 text-left text-sm rounded-md",
                       "transition-colors duration-75",
-                      index === menuItems.length - 1 && "mt-1",
-                      index === menuItems.length - 1 &&
+                      index === items.length - 1 && "mt-1",
+                      index === items.length - 1 &&
                         (isDark
                           ? "border-t border-gray-700"
                           : "border-t border-gray-200")

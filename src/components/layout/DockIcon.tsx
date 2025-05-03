@@ -14,6 +14,7 @@ export interface DockIconProps {
   isDark: boolean;
   onAppClick: (id: string) => void;
   onMinimizeApp: (id: string) => void;
+  isMobile?: boolean;
 }
 
 /**
@@ -25,6 +26,7 @@ export default function DockIcon({
   isDark,
   onAppClick,
   onMinimizeApp,
+  isMobile = false,
 }: DockIconProps) {
   // Use the dock icon animation hook
   const { ref, scale, y } = useDockIconAnimation(mouseX);
@@ -44,21 +46,30 @@ export default function DockIcon({
           app.isOpen ? onMinimizeApp(app.id) : onAppClick(app.id)
         }
         className={clsx(
-          "relative p-2 rounded-lg flex flex-col items-center top-1 pb-3"
+          "relative rounded-lg flex flex-col items-center",
+          isMobile ? "p-1 pb-2" : "p-2 pb-3",
+          isMobile ? "touch-manipulation" : ""
         )}
       >
         <img
           src={app.icon}
           alt={app.title}
-          className="w-12 h-12 transform transition-transform duration-200"
+          className={clsx(
+            "transform transition-transform duration-200",
+            isMobile ? "w-9 h-9" : "w-12 h-12"
+          )}
         />
         {/* Tooltip */}
         <div
           className={clsx(
-            "absolute -top-7 left-1/2 -translate-x-1/2",
-            "opacity-0 group-hover:opacity-100 transition-opacity",
+            "absolute left-1/2 -translate-x-1/2",
+            isMobile ? "-top-9" : "-top-7",
+            // On mobile, show tooltip on tap instead of hover
+            isMobile
+              ? "opacity-0 active:opacity-100 transition-opacity"
+              : "opacity-0 group-hover:opacity-100 transition-opacity",
             "px-2 py-1 text-xs rounded-md whitespace-nowrap",
-            isDark ? "bg-gray-800 text-gray-200" : "bg-gray-100 text-gray-900"
+            "bg-black/80 text-white"
           )}
         >
           {app.title}
@@ -67,7 +78,7 @@ export default function DockIcon({
             className={clsx(
               "absolute bottom-0 left-1/2 -translate-x-1/2",
               "w-2 h-2 transform rotate-45 -mb-1",
-              isDark ? "bg-gray-800" : "bg-gray-100"
+              "bg-black/80"
             )}
           ></div>
         </div>
@@ -78,7 +89,7 @@ export default function DockIcon({
           className={clsx(
             "absolute -bottom-1 left-1/2 -translate-x-1/2",
             "w-1 h-1 rounded-full animate-pulse",
-            isDark ? "bg-gray-200" : "bg-gray-100"
+            "bg-white"
           )}
         />
       )}

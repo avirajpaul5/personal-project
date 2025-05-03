@@ -96,7 +96,7 @@ export default function SpotlightSearch({
                 "rounded-xl border backdrop-blur-xl shadow-2xl overflow-hidden",
                 isDark
                   ? "border-gray-700 bg-gray-900/90"
-                  : "border-gray-200 bg-white/90"
+                  : "border-gray-200 bg-white"
               )}
               value={search}
               onValueChange={setSearch}

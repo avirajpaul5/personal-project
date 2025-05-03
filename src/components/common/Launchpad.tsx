@@ -87,26 +87,36 @@ export default function Launchpad({
 
           {/* App grid */}
           <div className="launchpad-grid">
-            {currentApps.map((app) => (
-              <motion.div
-                key={app.id}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{
-                  type: "spring",
-                  damping: 20,
-                  stiffness: 300,
-                  delay: Math.random() * 0.2,
-                }}
-                className="app-icon-container"
-                onClick={(e) => handleAppClick(app.id, e)}
-              >
-                <div className="app-icon">
-                  <img src={app.icon} alt={app.title} className="w-12 h-12 mt-6" />
-                </div>
-                <span className="app-title">{app.title}</span>
-              </motion.div>
-            ))}
+            {currentApps.length > 0 ? (
+              currentApps.map((app) => (
+                <motion.div
+                  key={app.id}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{
+                    type: "spring",
+                    damping: 20,
+                    stiffness: 300,
+                    delay: Math.random() * 0.2,
+                  }}
+                  className="app-icon-container"
+                  onClick={(e) => handleAppClick(app.id, e)}
+                >
+                  <div className="app-icon">
+                    <img
+                      src={app.icon}
+                      alt={app.title}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <span className="app-title">{app.title}</span>
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-full text-center text-white text-lg">
+                <p>No apps available</p>
+              </div>
+            )}
           </div>
 
           {/* Pagination dots */}

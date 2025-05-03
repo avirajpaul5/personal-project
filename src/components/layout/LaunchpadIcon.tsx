@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { useDockIconAnimation } from "../../hooks/useDockAnimation";
 import { MotionValue } from "framer-motion";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useState, useEffect } from "react";
 
 /**
  * LaunchpadIcon component props interface
@@ -24,6 +25,19 @@ export default function LaunchpadIcon({
   // Use the dock icon animation hook
   const { ref, scale, y } = useDockIconAnimation(mouseX);
 
+  // State to track if we're on a mobile device
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Effect to handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <motion.div
       ref={ref}
@@ -37,33 +51,40 @@ export default function LaunchpadIcon({
       <button
         onClick={onClick}
         className={clsx(
-          "relative p-2 rounded-lg flex flex-col items-center top-1 pb-3"
+          "relative rounded-lg flex flex-col items-center",
+          isMobile ? "p-2" : "p-2 pb-3",
+          isMobile ? "touch-manipulation" : ""
         )}
       >
         <img
           src="/assets/launchpad icon.png"
           alt="Launchpad"
-          className="w-12 h-12"
-        />
-        {/* Tooltip */}
-        <div
           className={clsx(
-            "absolute -top-7 left-1/2 -translate-x-1/2",
-            "opacity-0 group-hover:opacity-100 transition-opacity",
-            "px-2 py-1 text-xs rounded-md whitespace-nowrap",
-            isDark ? "bg-gray-800 text-gray-200" : "bg-gray-100 text-gray-900"
+            "transform transition-transform duration-200",
+            isMobile ? "w-12 h-12" : "w-12 h-12"
           )}
-        >
-          Launchpad
-          {/* Tooltip arrow */}
+        />
+        {/* Only show tooltip on non-mobile devices */}
+        {!isMobile && (
           <div
             className={clsx(
-              "absolute bottom-0 left-1/2 -translate-x-1/2",
-              "w-2 h-2 transform rotate-45 -mb-1",
-              isDark ? "bg-gray-800" : "bg-gray-100"
+              "absolute left-1/2 -translate-x-1/2 -top-7",
+              "opacity-0 group-hover:opacity-100 transition-opacity",
+              "px-2 py-1 text-xs rounded-md whitespace-nowrap",
+              "bg-black/80 text-white"
             )}
-          ></div>
-        </div>
+          >
+            Launchpad
+            {/* Tooltip arrow */}
+            <div
+              className={clsx(
+                "absolute bottom-0 left-1/2 -translate-x-1/2",
+                "w-2 h-2 transform rotate-45 -mb-1",
+                "bg-black/80"
+              )}
+            ></div>
+          </div>
+        )}
       </button>
     </motion.div>
   );

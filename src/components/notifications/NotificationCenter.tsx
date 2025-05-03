@@ -1,7 +1,7 @@
 // Import necessary dependencies
 import { motion } from "framer-motion";
 import { format } from "date-fns";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { WeatherWidget, WorldClockWidget } from "../widgets";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -25,6 +25,19 @@ export default function NotificationCenter({
 
   // Get the current theme
   const { isDark } = useTheme();
+
+  // State to track if we're on a mobile device
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Effect to handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Effect to handle clicks outside the notification center
   useEffect(() => {
@@ -67,11 +80,13 @@ export default function NotificationCenter({
         restDelta: 0.1,
       }}
       style={{ pointerEvents: isOpen ? "auto" : "none" }}
-      className={`fixed right-0 top-0 h-screen w-96 backdrop-blur-xl shadow-2xl z-[60] overflow-y-auto transition-colors duration-300 ${
-        isDark
-          ? "bg-gray-900/80 text-white border-l border-gray-700"
-          : "bg-white/90 text-gray-900 border-l border-gray-200"
-      }`}
+      className={`fixed right-0 top-0 h-screen shadow-2xl z-[60] overflow-y-auto transition-colors duration-300 backdrop-blur-xl
+        ${isMobile ? "w-full" : "w-96"}
+        ${
+          isDark
+            ? "bg-gray-900/80 text-white border-l border-gray-700"
+            : "bg-white/90 text-gray-900 border-l border-gray-200"
+        }`}
     >
       <div className="pt-7 p-6">
         {/* Header with date and close button */}
@@ -109,7 +124,7 @@ export default function NotificationCenter({
               Music
             </h3>
             <div
-              style={{ height: "360px" }}
+              style={{ height: isMobile ? "280px" : "360px" }}
               className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden"
             >
               <iframe
@@ -126,6 +141,22 @@ export default function NotificationCenter({
               />
             </div>
           </div>
+
+          {/* Mobile-only close button at the bottom */}
+          {isMobile && (
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={onClose}
+                className={`px-6 py-2 rounded-full transition-colors ${
+                  isDark
+                    ? "bg-gray-800 hover:bg-gray-700 text-white"
+                    : "bg-gray-200 hover:bg-gray-300 text-gray-900"
+                }`}
+              >
+                Close
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

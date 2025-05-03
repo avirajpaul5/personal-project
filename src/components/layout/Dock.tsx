@@ -1,5 +1,5 @@
 // Import necessary dependencies
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Window } from "../utils/types";
 import clsx from "clsx";
 import { motion } from "framer-motion";
@@ -36,6 +36,19 @@ export default function Dock({
     null
   );
 
+  // State to track if we're on a mobile device
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Effect to handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // Use the dock mouse tracking hook
   const { mouseX, handleMouseMove, handleMouseLeave } = useDockMouseTracking();
 
@@ -44,78 +57,88 @@ export default function Dock({
     (app) => app.isMinimized && app.showInDock !== false
   );
 
+  // Style for the dock - on mobile, it's just a circular button for Launchpad
+  const dockStyle = isMobile
+    ? {
+        maxWidth: "auto",
+        borderRadius: "50%",
+        padding: "0.5rem",
+      }
+    : {
+        maxWidth: "auto",
+      };
+
   return (
     <div className="relative w-full flex justify-center">
       <motion.div
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
+        style={dockStyle}
         className={clsx(
-          "fixed bottom-3 left-1/2 -translate-x-1/2",
-          "flex items-end backdrop-blur-xxl rounded-xl shadow-md px-3 py-2",
-          "transition-colors duration-300",
-          isDark
-            ? "bg-gray-900/30 border border-gray-700/50"
-            : "bg-white/30 border border-gray-300/50"
+          "fixed left-1/2 -translate-x-1/2",
+          isMobile ? "bottom-1" : "bottom-3",
+          "flex items-center justify-center backdrop-blur-xxl rounded-xl shadow-md",
+          isMobile ? "p-0" : "px-3 py-2",
+          "bg-black/20 border border-white/20"
         )}
       >
-        {/* Launchpad Icon */}
-        <LaunchpadIcon
-          mouseX={mouseX}
-          isDark={isDark}
-          onClick={onLaunchpadClick}
-        />
-
-        {/* Divider after Launchpad */}
-        <div
-          className={clsx(
-            "w-px h-9 mx-3",
-            isDark ? "bg-gray-600" : "bg-gray-300"
-          )}
-        />
-
-        {/* Open Apps Section */}
-        <div className="flex items-end space-x-3">
-          {apps
-            .filter((app) => !app.isMinimized && app.showInDock !== false)
-            .map((app) => (
-              <DockIcon
-                key={app.id}
-                app={app}
-                mouseX={mouseX}
-                isDark={isDark}
-                onAppClick={onAppClick}
-                onMinimizeApp={onMinimizeApp}
-              />
-            ))}
-        </div>
-
-        {/* Divider */}
-        {minimizedApps.length > 0 && (
-          <div
-            className={clsx(
-              "w-px h-9 mx-3",
-              isDark ? "bg-gray-600" : "bg-gray-300"
-            )}
+        <div className="flex items-center justify-center">
+          {/* Launchpad Icon */}
+          <LaunchpadIcon
+            mouseX={mouseX}
+            isDark={isDark}
+            onClick={onLaunchpadClick}
           />
-        )}
 
-        {/* Minimized Apps Section */}
-        {minimizedApps.length > 0 && (
-          <div className="flex items-end space-x-5">
-            {minimizedApps.map((app) => (
-              <MinimizedDockIcon
-                key={app.id}
-                app={app}
-                mouseX={mouseX}
-                isDark={isDark}
-                hoveredMinimizedApp={hoveredMinimizedApp}
-                onRestoreApp={onRestoreApp}
-                onCloseApp={onCloseApp}
-                setHoveredMinimizedApp={setHoveredMinimizedApp}
-              />
-            ))}
-          </div>
-        )}
+          {/* Only show other icons on non-mobile devices */}
+          {!isMobile && (
+            <>
+              {/* Divider after Launchpad */}
+              <div className="w-px h-9 mx-3 bg-white/30" />
+
+              {/* Open Apps Section */}
+              <div className="flex items-center space-x-3">
+                {apps
+                  .filter((app) => !app.isMinimized && app.showInDock !== false)
+                  .map((app) => (
+                    <DockIcon
+                      key={app.id}
+                      app={app}
+                      mouseX={mouseX}
+                      isDark={isDark}
+                      onAppClick={onAppClick}
+                      onMinimizeApp={onMinimizeApp}
+                      isMobile={isMobile}
+                    />
+                  ))}
+              </div>
+
+              {/* Divider */}
+              {minimizedApps.length > 0 && (
+                <div className="w-px h-9 mx-3 bg-white/30" />
+              )}
+
+              {/* Minimized Apps Section */}
+              {minimizedApps.length > 0 && (
+                <div className="flex items-center space-x-5">
+                  {minimizedApps.map((app) => (
+                    <MinimizedDockIcon
+                      key={app.id}
+                      app={app}
+                      mouseX={mouseX}
+                      isDark={isDark}
+                      hoveredMinimizedApp={hoveredMinimizedApp}
+                      onRestoreApp={onRestoreApp}
+                      onCloseApp={onCloseApp}
+                      setHoveredMinimizedApp={setHoveredMinimizedApp}
+                      isMobile={isMobile}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </motion.div>
     </div>
   );

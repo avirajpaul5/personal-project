@@ -139,7 +139,7 @@ export default function Window({
             <div
               ref={windowRef}
               className={clsx(
-                "flex flex-col backdrop-blur-md rounded-md shadow-md theme-transition",
+                "flex flex-col rounded-md shadow-md theme-transition backdrop-blur-md",
                 "border w-full h-full overflow-hidden",
                 isDark
                   ? "bg-gray-800/95 border-gray-600"
