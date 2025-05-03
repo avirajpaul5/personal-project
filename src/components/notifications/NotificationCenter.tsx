@@ -82,7 +82,7 @@ export default function NotificationCenter({
       }}
       style={{ pointerEvents: isOpen ? "auto" : "none" }}
       className={`fixed right-0 top-0 h-screen shadow-2xl z-[9999] overflow-y-auto transition-colors duration-300
-        ${isMobile ? "w-full" : "w-96"}
+        ${isMobile ? "w-full flex flex-col" : "w-96"}
         backdrop-filter blur-16 saturate-180
         -webkit-backdrop-filter blur-16 saturate-180
         ${
@@ -91,7 +91,7 @@ export default function NotificationCenter({
             : "bg-[rgba(255,255,255,0.75)] border-l border-[rgba(0,0,0,0.125)]"
         }`}
     >
-      <div className="pt-7 p-6">
+      <div className={`pt-7 p-6 ${isMobile ? "h-full flex flex-col" : ""}`}>
         {/* Header with date and close button */}
         <div className="flex items-center justify-between mb-6">
           <h2
@@ -115,10 +115,12 @@ export default function NotificationCenter({
         </div>
 
         {/* Content area with widgets and Spotify embed */}
-        <div className="space-y-5">
+        <div className={`space-y-5 ${isMobile ? "flex-1 flex flex-col" : ""}`}>
           <WorldClockWidget />
           <WeatherWidget />
-          <div className="mt-6">
+          <div
+            className={`mt-6 ${isMobile ? "flex-1 flex flex-col min-h-0" : ""}`}
+          >
             <h3
               className={`font-bold mb-4 ${
                 isDark ? "text-white" : "text-gray-800"
@@ -127,8 +129,10 @@ export default function NotificationCenter({
               Music
             </h3>
             <div
-              style={{ height: isMobile ? "280px" : "360px" }}
-              className="border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden"
+              style={{ height: isMobile ? "auto" : "360px" }}
+              className={`border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden ${
+                isMobile ? "flex-1 min-h-0" : ""
+              }`}
             >
               <iframe
                 src={`https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=${
