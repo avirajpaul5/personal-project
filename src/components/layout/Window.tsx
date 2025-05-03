@@ -85,28 +85,9 @@ export default function Window({
   // Navbar height is 28px (h-7 in Tailwind)
   const navbarHeight = 28;
 
-  // Conditional container style for maximized and normal state
-  const containerStyle = isMaximized
-    ? {
-        position: "fixed" as const,
-        top: navbarHeight + "px", // Position exactly at navbar bottom
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: "100vw",
-        height: `calc(100vh - ${navbarHeight}px)`,
-        zIndex: style?.zIndex || 1000,
-        originX: 0,
-        originY: 0,
-        padding: 0,
-        margin: 0,
-        borderRadius: 0,
-        boxSizing: "border-box",
-      }
-    : {
-        position: "absolute" as const,
-        zIndex: style?.zIndex || 1000,
-      };
+  // Calculate dimensions for maximized state
+  const maxWidth = window.innerWidth;
+  const maxHeight = window.innerHeight - navbarHeight;
 
   return (
     <AnimatePresence
@@ -118,12 +99,17 @@ export default function Window({
       {isVisible && (
         <motion.div
           style={{
-            ...containerStyle,
+            position: isMaximized ? "fixed" : "absolute",
+            top: isMaximized ? navbarHeight : undefined,
+            left: isMaximized ? 0 : undefined,
+            right: isMaximized ? 0 : undefined,
+            bottom: isMaximized ? 0 : undefined,
+            width: isMaximized ? "100%" : undefined,
+            height: isMaximized ? `calc(100vh - ${navbarHeight}px)` : undefined,
+            zIndex: style?.zIndex || 1000,
             margin: 0,
             padding: 0,
-            boxSizing: "border-box",
           }}
-          className={isMaximized ? "m-0 p-0" : ""}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
           exit={exitVariants[exitType]}
@@ -134,21 +120,12 @@ export default function Window({
               display: "flex",
               alignItems: "stretch",
               justifyContent: "stretch",
-              transition: "width 0.3s, height 0.3s, transform 0.3s",
-              padding: 0,
-              margin: 0,
-              boxSizing: "border-box",
+              transition: isMaximized
+                ? "none"
+                : "width 0.3s, height 0.3s, transform 0.3s",
               ...style,
             }}
-            className={isMaximized ? "m-0 p-0" : ""}
-            size={
-              isMaximized
-                ? {
-                    width: window.innerWidth,
-                    height: window.innerHeight - navbarHeight,
-                  }
-                : size
-            }
+            size={isMaximized ? { width: maxWidth, height: maxHeight } : size}
             position={isMaximized ? { x: 0, y: 0 } : { x, y }}
             onDragStop={handleDragStop}
             onResize={handleResize}
@@ -162,16 +139,14 @@ export default function Window({
               ref={windowRef}
               className={clsx(
                 "flex flex-col theme-transition backdrop-blur-md",
-                isMaximized ? "m-0 p-0" : "rounded-md shadow-md",
+                isMaximized
+                  ? "rounded-none border-0"
+                  : "rounded-md shadow-md border",
                 "w-full h-full overflow-hidden",
-                isMaximized ? "border-0" : "border",
                 isDark
                   ? "bg-gray-800/95 border-gray-600"
                   : "bg-white/95 border-gray-200"
               )}
-              style={
-                isMaximized ? { margin: 0, padding: 0, borderRadius: 0 } : {}
-              }
               onClick={onBodyClick}
             >
               {/* Window title bar */}
