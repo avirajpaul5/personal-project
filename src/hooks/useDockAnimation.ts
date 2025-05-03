@@ -26,17 +26,22 @@ export function useDockIconAnimation(
     return val - bounds.x - bounds.width / 2;
   });
 
-  // Scale based on mouse distance
+  // Scale based on mouse distance with optimized spring settings
   const scaleSync = useTransform(distance, distanceRange, scaleRange);
   const scale = useSpring(scaleSync, {
-    mass: 0.2,
-    stiffness: 250,
-    damping: 12,
+    mass: 0.1, // Reduced mass for faster response
+    stiffness: 300, // Increased stiffness for snappier animation
+    damping: 15, // Adjusted damping for smoother motion
+    restSpeed: 0.01, // Lower rest speed for better performance
   });
 
-  // Y position based on scale
+  // Y position based on scale with optimized spring settings
   const ySync = useTransform(scale, [1, 1.3], [0, -8]);
-  const y = useSpring(ySync, { stiffness: 300, damping: 12 });
+  const y = useSpring(ySync, {
+    stiffness: 400, // Increased stiffness for snappier animation
+    damping: 15, // Adjusted damping for smoother motion
+    restSpeed: 0.01, // Lower rest speed for better performance
+  });
 
   return { ref, scale, y };
 }

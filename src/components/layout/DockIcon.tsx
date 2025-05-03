@@ -4,6 +4,10 @@ import { Window } from "../utils/types";
 import { useDockIconAnimation } from "../../hooks/useDockAnimation";
 import { MotionValue } from "framer-motion";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useState, useEffect } from "react";
+
+// Image cache to store loaded images
+const imageCache = new Map<string, HTMLImageElement>();
 
 /**
  * DockIcon component props interface
@@ -30,6 +34,21 @@ export default function DockIcon({
 }: DockIconProps) {
   // Use the dock icon animation hook
   const { ref, scale, y } = useDockIconAnimation(mouseX);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+  // Load and cache image
+  useEffect(() => {
+    if (!imageCache.has(app.icon)) {
+      const img = new Image();
+      img.src = app.icon;
+      img.onload = () => {
+        imageCache.set(app.icon, img);
+        setIsImageLoaded(true);
+      };
+    } else {
+      setIsImageLoaded(true);
+    }
+  }, [app.icon]);
 
   return (
     <motion.div
@@ -38,6 +57,7 @@ export default function DockIcon({
         scale,
         y,
         transformOrigin: "bottom center",
+        willChange: "transform", // Optimize for GPU acceleration
       }}
       className="relative group"
     >
@@ -51,14 +71,18 @@ export default function DockIcon({
           isMobile ? "touch-manipulation" : ""
         )}
       >
-        <img
-          src={app.icon}
-          alt={app.title}
-          className={clsx(
-            "transform transition-transform duration-200",
-            isMobile ? "w-9 h-9" : "w-12 h-12"
-          )}
-        />
+        {isImageLoaded && (
+          <img
+            src={app.icon}
+            alt={app.title}
+            className={clsx(
+              "transform transition-transform duration-200",
+              isMobile ? "w-9 h-9" : "w-12 h-12",
+              "object-contain" // Ensure proper image scaling
+            )}
+            loading="eager" // Load immediately since we're preloading
+          />
+        )}
         {/* Tooltip */}
         <div
           className={clsx(

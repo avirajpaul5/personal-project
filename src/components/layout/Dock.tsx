@@ -10,6 +10,14 @@ import { useDockMouseTracking } from "../../hooks/useDockAnimation";
 import { useTheme } from "../../contexts/ThemeContext";
 import { DockIconProps } from "./DockIcon";
 
+// Add icon preloading function
+const preloadIcons = (apps: Window[]) => {
+  apps.forEach((app) => {
+    const img = new Image();
+    img.src = app.icon;
+  });
+};
+
 // Define the props for the Dock component
 interface DockProps {
   apps: Window[];
@@ -38,6 +46,11 @@ export default function Dock({
 
   // State to track if we're on a mobile device
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Preload icons on component mount
+  useEffect(() => {
+    preloadIcons(apps);
+  }, [apps]);
 
   // Effect to handle window resize
   useEffect(() => {
@@ -120,7 +133,7 @@ export default function Dock({
                 <div className="w-px h-9 mx-3 bg-white/30" />
               )}
 
-              {/* Minimized Apps Section */}
+              {/* Minimized Apps Section - Lazy load minimized apps */}
               {minimizedApps.length > 0 && (
                 <div className="flex items-center space-x-5">
                   {minimizedApps.map((app) => (
