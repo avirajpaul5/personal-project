@@ -5,6 +5,7 @@ import { useRef, useEffect, useState } from "react";
 import { WeatherWidget, WorldClockWidget } from "../widgets";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { useTheme } from "../../contexts/ThemeContext";
+import { createPortal } from "react-dom";
 
 // Define props interface for NotificationCenter component
 interface NotificationCenterProps {
@@ -68,7 +69,7 @@ export default function NotificationCenter({
   // Spotify playlist ID for embedded player
   const playlistId = "3rE6ZLp7YXOhSIFSfv4LUM";
 
-  return (
+  return createPortal(
     <motion.div
       ref={panelRef}
       initial={{ opacity: 0, x: 400 }}
@@ -80,7 +81,7 @@ export default function NotificationCenter({
         restDelta: 0.1,
       }}
       style={{ pointerEvents: isOpen ? "auto" : "none" }}
-      className={`fixed right-0 top-0 h-screen shadow-2xl z-[60] overflow-y-auto transition-colors duration-300 backdrop-blur-xl
+      className={`fixed right-0 top-0 h-screen shadow-2xl z-[9999] overflow-y-auto transition-colors duration-300 backdrop-blur-xl
         ${isMobile ? "w-full" : "w-96"}
         ${
           isDark
@@ -159,6 +160,7 @@ export default function NotificationCenter({
           )}
         </div>
       </div>
-    </motion.div>
+    </motion.div>,
+    document.body
   );
 }
