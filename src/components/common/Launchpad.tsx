@@ -138,12 +138,6 @@ export default function Launchpad({
             )}
           </div>
 
-<<<<<<< Updated upstream
-          {/* App grid */}
-          <div className="launchpad-grid">
-            {currentApps.length > 0 ? (
-              currentApps.map((app) => (
-=======
           {/* No results message */}
           {filteredApps.length === 0 && searchQuery && (
             <motion.div
@@ -162,7 +156,6 @@ export default function Launchpad({
           {(filteredApps.length > 0 || !searchQuery) && (
             <div className="launchpad-grid">
               {currentApps.map((app) => (
->>>>>>> Stashed changes
                 <motion.div
                   key={app.id}
                   initial={{ scale: 0.8, opacity: 0 }}
@@ -180,16 +173,11 @@ export default function Launchpad({
                     <img
                       src={app.icon}
                       alt={app.title}
-<<<<<<< Updated upstream
                       className="w-full h-full object-contain"
-=======
-                      className="w-12 h-12 mt-6"
->>>>>>> Stashed changes
                     />
                   </div>
                   <span className="app-title">{app.title}</span>
                 </motion.div>
-<<<<<<< Updated upstream
               ))
             ) : (
               <div className="col-span-full text-center text-white text-lg">
@@ -197,11 +185,6 @@ export default function Launchpad({
               </div>
             )}
           </div>
-=======
-              ))}
-            </div>
-          )}
->>>>>>> Stashed changes
 
           {/* Pagination dots */}
           {totalPages > 1 && (
