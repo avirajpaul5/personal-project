@@ -1,0 +1,23 @@
+/* Spotlight search styles */
+/* Mobile-first responsive styles for spotlight search */
+@media (max-width: 640px) {
+  .cmdk-input {
+    font-size: 14px !important;
+  }
+
+  .cmdk-item {
+    padding: 8px !important;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+  .cmdk-input {
+    font-size: 13px !important;
+    height: 36px !important;
+  }
+
+  .cmdk-item {
+    padding: 6px !important;
+  }
+}

@@ -10,6 +10,7 @@ import {
   CommandLineIcon,
 } from "@heroicons/react/24/outline";
 import { useTheme } from "../../contexts/ThemeContext";
+import "../../styles/spotlight.css";
 
 interface SpotlightSearchProps {
   isOpen: boolean;
@@ -84,94 +85,96 @@ export default function SpotlightSearch({
             className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-50"
             onClick={onClose}
           />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.1 }}
-            className="fixed left-1/3 top-[20%] -translate-x-1/2 w-full max-w-xl z-50"
-          >
-            <Command
-              className={clsx(
-                "rounded-xl border backdrop-blur-xl shadow-2xl overflow-hidden",
-                isDark
-                  ? "border-gray-700 bg-gray-900/90"
-                  : "border-gray-200 bg-white"
-              )}
-              value={search}
-              onValueChange={setSearch}
+          <div className="fixed inset-0 flex items-start justify-center pt-[10vh] sm:pt-[15vh] md:pt-[20vh] z-50 pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.1 }}
+              className="w-[90%] max-w-xl pointer-events-auto"
             >
-              <div
+              <Command
                 className={clsx(
-                  "flex items-center border-b px-3",
-                  isDark ? "border-gray-700" : "border-gray-200"
+                  "rounded-xl border backdrop-blur-xl shadow-2xl overflow-hidden w-full",
+                  isDark
+                    ? "border-gray-700 bg-gray-900/90"
+                    : "border-gray-200 bg-white/90"
                 )}
+                value={search}
+                onValueChange={setSearch}
               >
-                <MagnifyingGlassIcon
+                <div
                   className={clsx(
-                    "w-5 h-5 mr-5 ml-1",
-                    isDark ? "text-gray-400" : "text-gray-500"
-                  )}
-                />
-                <Command.Input
-                  autoFocus
-                  placeholder="Search..."
-                  className={clsx(
-                    "flex-1 h-12 bg-transparent border-0 outline-none placeholder:text-sm",
-                    isDark
-                      ? "text-gray-200 placeholder:text-gray-400"
-                      : "text-gray-900 placeholder:text-gray-500"
-                  )}
-                />
-                <kbd
-                  className={clsx(
-                    "hidden md:block text-xs font-mono px-1.5 py-0.5 border rounded",
-                    isDark
-                      ? "text-gray-400 border-gray-700"
-                      : "text-gray-500 border-gray-300"
+                    "flex items-center border-b px-3",
+                    isDark ? "border-gray-700" : "border-gray-200"
                   )}
                 >
-                  esc
-                </kbd>
-              </div>
-              <Command.List className="max-h-80 overflow-y-auto p-2">
-                <Command.Empty
-                  className={clsx(
-                    "text-sm text-center py-4",
-                    isDark ? "text-gray-400" : "text-gray-500"
-                  )}
-                >
-                  No results found.
-                </Command.Empty>
-                {searchItems.map((item) => (
-                  <Command.Item
-                    key={item.id}
-                    value={item.name}
-                    onSelect={() => handleSelect(item.id)}
+                  <MagnifyingGlassIcon
                     className={clsx(
-                      "flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-pointer",
+                      "w-5 h-5 mr-5 ml-1",
+                      isDark ? "text-gray-400" : "text-gray-500"
+                    )}
+                  />
+                  <Command.Input
+                    autoFocus
+                    placeholder="Search..."
+                    className={clsx(
+                      "flex-1 h-12 bg-transparent border-0 outline-none placeholder:text-sm cmdk-input",
                       isDark
-                        ? "text-gray-300 aria-selected:bg-gray-800"
-                        : "text-gray-700 aria-selected:bg-gray-100"
+                        ? "text-gray-200 placeholder:text-gray-400"
+                        : "text-gray-900 placeholder:text-gray-500"
+                    )}
+                  />
+                  <kbd
+                    className={clsx(
+                      "hidden md:block text-xs font-mono px-1.5 py-0.5 border rounded",
+                      isDark
+                        ? "text-gray-400 border-gray-700"
+                        : "text-gray-500 border-gray-300"
                     )}
                   >
-                    <item.icon
+                    esc
+                  </kbd>
+                </div>
+                <Command.List className="max-h-[50vh] overflow-y-auto p-2">
+                  <Command.Empty
+                    className={clsx(
+                      "text-sm text-center py-4",
+                      isDark ? "text-gray-400" : "text-gray-500"
+                    )}
+                  >
+                    No results found.
+                  </Command.Empty>
+                  {searchItems.map((item) => (
+                    <Command.Item
+                      key={item.id}
+                      value={item.name}
+                      onSelect={() => handleSelect(item.id)}
                       className={clsx(
-                        "w-5 h-5",
-                        isDark ? "text-gray-400" : "text-gray-500"
+                        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm cursor-pointer cmdk-item",
+                        isDark
+                          ? "text-gray-300 aria-selected:bg-gray-800"
+                          : "text-gray-700 aria-selected:bg-gray-100"
                       )}
-                    />
-                    <div>
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-gray-500 text-xs">
-                        {item.description}
+                    >
+                      <item.icon
+                        className={clsx(
+                          "w-5 h-5",
+                          isDark ? "text-gray-400" : "text-gray-500"
+                        )}
+                      />
+                      <div>
+                        <div className="font-medium">{item.name}</div>
+                        <div className="text-gray-500 text-xs">
+                          {item.description}
+                        </div>
                       </div>
-                    </div>
-                  </Command.Item>
-                ))}
-              </Command.List>
-            </Command>
-          </motion.div>
+                    </Command.Item>
+                  ))}
+                </Command.List>
+              </Command>
+            </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>
