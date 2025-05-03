@@ -81,9 +81,7 @@ export default function Dock({
           isMobile ? "p-0" : "px-3 py-2",
           "backdrop-filter blur-16 saturate-180",
           "-webkit-backdrop-filter blur-16 saturate-180",
-          isDark
-            ? "bg-[rgba(17,24,39,0.75)] border-[rgba(255,255,255,0.125)]"
-            : "bg-[rgba(255,255,255,0.75)] border-[rgba(0,0,0,0.125)]"
+          "bg-[rgba(255,255,255,0.75)] border-[rgba(0,0,0,0.125)]"
         )}
       >
         <div className="flex items-center justify-center">

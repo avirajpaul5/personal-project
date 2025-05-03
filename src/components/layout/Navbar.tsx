@@ -61,7 +61,7 @@ export default function Navbar({ openWindow }: NavbarProps) {
   return (
     <div
       className={clsx(
-        "fixed top-0 left-0 right-0 h-7 flex items-center justify-between px-4 text-sm z-50 app-navbar transition-colors duration-300 backdrop-blur-xl",
+        "fixed top-0 left-0 right-0 h-9 flex items-center justify-between px-4 text-sm z-50 app-navbar transition-colors duration-300 backdrop-blur-xl",
         isDark ? "bg-gray-900/30 text-gray-300" : "bg-white/50 text-gray-900"
       )}
     >
