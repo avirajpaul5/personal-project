@@ -88,19 +88,22 @@ export function useWindowState(
       // Store current size and position before maximizing
       previousSize.current = size;
       previousPosition.current = { x: initialPosition.x, y: initialPosition.y };
-      // Set window size to full screen
+
+      // Navbar height is 28px (h-7 in Tailwind)
+      const navbarHeight = 28;
+
+      // Set window size to full screen minus navbar height
       setSize({
         width: window.innerWidth,
-        height: window.innerHeight,
+        height: window.innerHeight - navbarHeight,
       });
-      onPositionChange(0, 0);
+
+      // Position window just below the navbar with no gap
+      onPositionChange(0, navbarHeight);
     } else {
       // Restore previous size and position
       setSize(previousSize.current);
-      onPositionChange(
-        previousPosition.current.x,
-        previousPosition.current.y
-      );
+      onPositionChange(previousPosition.current.x, previousPosition.current.y);
     }
     if (onMaximize) {
       onMaximize();

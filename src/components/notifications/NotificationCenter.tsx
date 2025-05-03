@@ -81,12 +81,14 @@ export default function NotificationCenter({
         restDelta: 0.1,
       }}
       style={{ pointerEvents: isOpen ? "auto" : "none" }}
-      className={`fixed right-0 top-0 h-screen shadow-2xl z-[9999] overflow-y-auto transition-colors duration-300 backdrop-blur-xl
+      className={`fixed right-0 top-0 h-screen shadow-2xl z-[9999] overflow-y-auto transition-colors duration-300
         ${isMobile ? "w-full" : "w-96"}
+        backdrop-filter blur-16 saturate-180
+        -webkit-backdrop-filter blur-16 saturate-180
         ${
           isDark
-            ? "bg-gray-900/80 text-white border-l border-gray-700"
-            : "bg-white/90 text-gray-900 border-l border-gray-200"
+            ? "bg-[rgba(17,24,39,0.75)] border-l border-[rgba(255,255,255,0.125)]"
+            : "bg-[rgba(255,255,255,0.75)] border-l border-[rgba(0,0,0,0.125)]"
         }`}
     >
       <div className="pt-7 p-6">

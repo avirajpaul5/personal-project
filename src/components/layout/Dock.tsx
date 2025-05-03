@@ -77,9 +77,13 @@ export default function Dock({
         className={clsx(
           "fixed left-1/2 -translate-x-1/2",
           isMobile ? "bottom-1" : "bottom-3",
-          "flex items-center justify-center backdrop-blur-xxl rounded-xl shadow-md",
+          "flex items-center justify-center rounded-xl shadow-md",
           isMobile ? "p-0" : "px-3 py-2",
-          "bg-black/20 border border-white/20"
+          "backdrop-filter blur-16 saturate-180",
+          "-webkit-backdrop-filter blur-16 saturate-180",
+          isDark
+            ? "bg-[rgba(17,24,39,0.75)] border-[rgba(255,255,255,0.125)]"
+            : "bg-[rgba(255,255,255,0.75)] border-[rgba(0,0,0,0.125)]"
         )}
       >
         <div className="flex items-center justify-center">

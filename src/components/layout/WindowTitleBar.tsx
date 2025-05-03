@@ -9,6 +9,7 @@ interface WindowTitleBarProps {
   onClose: () => void;
   onMinimize: () => void;
   onMaximize: () => void;
+  isMaximized?: boolean;
 }
 
 /**
@@ -19,15 +20,18 @@ export default function WindowTitleBar({
   onClose,
   onMinimize,
   onMaximize,
+  isMaximized = false,
 }: WindowTitleBarProps) {
   // Get theme from context
   const { isDark } = useTheme();
   return (
     <div
       className={clsx(
-        "window-handle flex items-center p-2 border-b",
+        "window-handle flex items-center border-b",
+        isMaximized ? "px-2 py-1" : "p-2",
         isDark ? "bg-gray-700 border-gray-600" : "bg-gray-100 border-gray-200"
       )}
+      style={isMaximized ? { borderRadius: 0 } : {}}
     >
       {/* Window control buttons */}
       <div className="flex space-x-2 pl-2">
