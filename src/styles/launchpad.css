@@ -97,3 +97,13 @@
 .pagination-dot.active {
   background-color: white;
 }
+
+.no-results {
+  grid-column: 1 / -1 !important; /* Ensure it spans all columns */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 100%;
+  margin-top: 100px; /* Add some top margin for better positioning */
+}

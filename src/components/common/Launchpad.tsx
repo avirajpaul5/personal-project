@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { Window } from "../utils/types";
@@ -21,22 +21,40 @@ export default function Launchpad({
 }: LaunchpadProps) {
   const { isDark } = useTheme();
 
+  // State for search
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   // State for pagination
   const [currentPage, setCurrentPage] = useState(0);
   const appsPerPage = 32; // 8 columns x 4 rows
-  const totalPages = Math.ceil(apps.length / appsPerPage);
 
-  // Handle Escape key to close Launchpad
+  // Filter apps based on search query
+  const filteredApps = apps.filter((app) =>
+    app.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredApps.length / appsPerPage);
+
+  // Handle Escape key to close Launchpad or clear search
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
-        onClose();
+        if (searchQuery) {
+          // If there's a search query, clear it first
+          e.preventDefault();
+          setSearchQuery("");
+          searchInputRef.current?.focus();
+        } else {
+          // Otherwise close the Launchpad
+          onClose();
+        }
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, searchQuery]);
 
   // Handle app click
   const handleAppClick = (id: string, e: React.MouseEvent) => {
@@ -46,10 +64,25 @@ export default function Launchpad({
   };
 
   // Get current page apps
-  const currentApps = apps.slice(
+  const currentApps = filteredApps.slice(
     currentPage * appsPerPage,
     (currentPage + 1) * appsPerPage
   );
+
+  // Reset to first page when search query changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchQuery]);
+
+  // Focus search input when Launchpad opens
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      // Small delay to ensure the component is fully rendered
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen]);
 
   // Handle page change
   const handlePageChange = (newPage: number, e: React.MouseEvent) => {
@@ -62,6 +95,11 @@ export default function Launchpad({
   // Handle search click
   const handleSearchClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent the click from closing the Launchpad
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   return (
@@ -79,35 +117,70 @@ export default function Launchpad({
           <div className="search-bar" onClick={handleSearchClick}>
             <Search className="w-4 h-4 text-white/70 mr-2" />
             <input
+              ref={searchInputRef}
               type="text"
               placeholder="Search"
+              value={searchQuery}
+              onChange={handleSearchChange}
               className="bg-transparent border-none outline-none text-white text-sm w-full placeholder-white/70"
             />
+            {searchQuery && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSearchQuery("");
+                  searchInputRef.current?.focus();
+                }}
+                className="text-white/70 text-xs ml-1 hover:text-white"
+              >
+                ✕
+              </button>
+            )}
           </div>
 
-          {/* App grid */}
-          <div className="launchpad-grid">
-            {currentApps.map((app) => (
-              <motion.div
-                key={app.id}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{
-                  type: "spring",
-                  damping: 20,
-                  stiffness: 300,
-                  delay: Math.random() * 0.2,
-                }}
-                className="app-icon-container"
-                onClick={(e) => handleAppClick(app.id, e)}
-              >
-                <div className="app-icon">
-                  <img src={app.icon} alt={app.title} className="w-12 h-12 mt-6" />
-                </div>
-                <span className="app-title">{app.title}</span>
-              </motion.div>
-            ))}
-          </div>
+          {/* No results message */}
+          {filteredApps.length === 0 && searchQuery && (
+            <motion.div
+              className="no-results"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className="text-white text-lg">
+                No results found for "{searchQuery}"
+              </p>
+            </motion.div>
+          )}
+
+          {/* App grid - only show if we have results or no search query */}
+          {(filteredApps.length > 0 || !searchQuery) && (
+            <div className="launchpad-grid">
+              {currentApps.map((app) => (
+                <motion.div
+                  key={app.id}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{
+                    type: "spring",
+                    damping: 20,
+                    stiffness: 300,
+                    delay: Math.random() * 0.2,
+                  }}
+                  className="app-icon-container"
+                  onClick={(e) => handleAppClick(app.id, e)}
+                >
+                  <div className="app-icon">
+                    <img
+                      src={app.icon}
+                      alt={app.title}
+                      className="w-12 h-12 mt-6"
+                    />
+                  </div>
+                  <span className="app-title">{app.title}</span>
+                </motion.div>
+              ))}
+            </div>
+          )}
 
           {/* Pagination dots */}
           {totalPages > 1 && (
