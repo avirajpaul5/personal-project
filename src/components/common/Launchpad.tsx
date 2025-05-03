@@ -144,6 +144,7 @@ export default function Launchpad({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           className="launchpad-container"
+          style={{ zIndex: 9999 }} // Ensure consistent z-index with CSS
           onClick={onClose} // Close when clicking anywhere
         >
           {/* Search bar */}
