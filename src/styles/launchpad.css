@@ -6,9 +6,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background-color: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
+  overflow-y: auto;
+  padding-bottom: 60px;
+}
+
+@media (max-width: 768px) {
+  .launchpad-container {
+    padding-top: 60px;
+    padding-bottom: 80px;
+  }
 }
 
 .launchpad-grid {
@@ -23,6 +32,41 @@
   margin-top: 60px;
 }
 
+/* Responsive grid for tablets */
+@media (max-width: 1024px) {
+  .launchpad-grid {
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+    gap: 35px;
+    max-width: 700px;
+  }
+}
+
+/* Responsive grid for mobile */
+@media (max-width: 768px) {
+  .launchpad-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: minmax(80px, auto);
+    gap: 20px;
+    max-width: 100%;
+    padding: 15px;
+    margin-top: 40px;
+    height: auto;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+  .launchpad-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: minmax(70px, auto);
+    gap: 15px;
+    padding: 10px;
+    margin-top: 30px;
+    height: auto;
+  }
+}
+
 .app-icon-container {
   display: flex;
   flex-direction: column;
@@ -30,6 +74,10 @@
   justify-content: center;
   cursor: pointer;
   transition: transform 0.2s ease;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  padding: 5px;
 }
 
 .app-icon-container:hover {
@@ -49,6 +97,54 @@
   width: 48px;
   height: 48px;
   object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Responsive app icons for mobile */
+@media (max-width: 768px) {
+  .app-icon-container {
+    min-height: 80px;
+    padding: 5px 0;
+  }
+
+  .app-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 6px;
+  }
+
+  .app-icon img {
+    width: 40px;
+    height: 40px;
+    margin-top: 0 !important;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+  .app-icon-container {
+    min-height: 70px;
+    padding: 3px 0;
+  }
+
+  .app-icon {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 4px;
+  }
+
+  .app-icon img {
+    width: 32px;
+    height: 32px;
+    margin-top: 0 !important;
+  }
+
+  .app-title {
+    font-size: 10px;
+    max-width: 60px;
+    margin-top: 2px;
+  }
 }
 
 .app-title {
@@ -60,6 +156,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: 5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .search-bar {
@@ -77,6 +175,27 @@
   backdrop-filter: blur(4px);
 }
 
+/* Responsive search bar for mobile */
+@media (max-width: 768px) {
+  .search-bar {
+    width: 80%;
+    max-width: 240px;
+    top: 15px;
+    height: 32px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+  .search-bar {
+    width: 90%;
+    max-width: 200px;
+    top: 10px;
+    height: 28px;
+    font-size: 12px;
+  }
+}
+
 .pagination {
   position: absolute;
   bottom: 30px;
@@ -84,6 +203,25 @@
   transform: translateX(-50%);
   display: flex;
   gap: 8px;
+}
+
+/* Responsive pagination for mobile */
+@media (max-width: 768px) {
+  .pagination {
+    bottom: 15px;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+  .pagination {
+    bottom: 10px;
+  }
+
+  .pagination-dot {
+    width: 6px;
+    height: 6px;
+  }
 }
 
 .pagination-dot {
@@ -96,4 +234,14 @@
 
 .pagination-dot.active {
   background-color: white;
+}
+
+.no-results {
+  grid-column: 1 / -1 !important; /* Ensure it spans all columns */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 100%;
+  margin-top: 100px; /* Add some top margin for better positioning */
 }

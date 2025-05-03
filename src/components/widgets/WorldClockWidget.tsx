@@ -36,7 +36,7 @@ export default function WorldClockWidget() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white/70 dark:bg-gray-800/50 rounded-xl p-5 shadow-lg border border-gray-100 dark:border-gray-700"
+      className="bg-white dark:bg-gray-800/50 rounded-xl p-5 shadow-lg border border-gray-100 dark:border-gray-700"
     >
       <h3 className="font-bold mb-4 text-gray-800 dark:text-gray-100">
         World Clock
