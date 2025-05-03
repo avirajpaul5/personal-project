@@ -23,20 +23,19 @@
 .launchpad-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(5, 1fr);
   gap: 45px;
   width: 100%;
   max-width: 950px;
   padding: 20px;
   margin: 0 auto;
   margin-top: 60px;
+  justify-items: center;
 }
 
 /* Responsive grid for tablets */
 @media (max-width: 1024px) {
   .launchpad-grid {
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(7, 1fr);
     gap: 35px;
     max-width: 700px;
   }
@@ -45,25 +44,21 @@
 /* Responsive grid for mobile */
 @media (max-width: 768px) {
   .launchpad-grid {
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: minmax(80px, auto);
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     max-width: 100%;
     padding: 15px;
     margin-top: 40px;
-    height: auto;
   }
 }
 
 /* Extra small devices */
 @media (max-width: 375px) {
   .launchpad-grid {
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: minmax(70px, auto);
+    grid-template-columns: repeat(3, 1fr);
     gap: 15px;
     padding: 10px;
     margin-top: 30px;
-    height: auto;
   }
 }
 
@@ -74,8 +69,8 @@
   justify-content: center;
   cursor: pointer;
   transition: transform 0.2s ease;
-  width: 100%;
-  height: 100%;
+  width: 80px;
+  height: 90px;
   text-align: center;
   padding: 5px;
 }
@@ -85,8 +80,8 @@
 }
 
 .app-icon {
-  width: 70px;
-  height: 70px;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -104,40 +99,40 @@
 /* Responsive app icons for mobile */
 @media (max-width: 768px) {
   .app-icon-container {
-    min-height: 80px;
+    width: 70px;
+    height: 80px;
     padding: 5px 0;
   }
 
   .app-icon {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     margin-bottom: 6px;
   }
 
   .app-icon img {
     width: 40px;
     height: 40px;
-    margin-top: 0 !important;
   }
 }
 
 /* Extra small devices */
 @media (max-width: 375px) {
   .app-icon-container {
-    min-height: 70px;
+    width: 60px;
+    height: 70px;
     padding: 3px 0;
   }
 
   .app-icon {
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     margin-bottom: 4px;
   }
 
   .app-icon img {
     width: 32px;
     height: 32px;
-    margin-top: 0 !important;
   }
 
   .app-title {
@@ -152,12 +147,14 @@
   font-weight: 500;
   color: white;
   text-align: center;
+  width: 100%;
   max-width: 80px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 5px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  line-height: 1.2;
 }
 
 .search-bar {
@@ -202,20 +199,28 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  padding: 8px 12px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  backdrop-filter: blur(4px);
 }
 
 /* Responsive pagination for mobile */
 @media (max-width: 768px) {
   .pagination {
-    bottom: 15px;
+    bottom: 20px;
+    gap: 8px;
+    padding: 6px 10px;
   }
 }
 
 /* Extra small devices */
 @media (max-width: 375px) {
   .pagination {
-    bottom: 10px;
+    bottom: 15px;
+    gap: 6px;
+    padding: 4px 8px;
   }
 
   .pagination-dot {
@@ -229,11 +234,19 @@
   height: 8px;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.4);
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pagination-dot:hover {
+  background-color: rgba(255, 255, 255, 0.6);
 }
 
 .pagination-dot.active {
   background-color: white;
+  transform: scale(1.2);
 }
 
 .no-results {

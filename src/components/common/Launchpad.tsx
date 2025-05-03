@@ -27,7 +27,27 @@ export default function Launchpad({
 
   // State for pagination
   const [currentPage, setCurrentPage] = useState(0);
-  const appsPerPage = 32; // 8 columns x 4 rows
+  // Adjust apps per page based on screen size
+  const [appsPerPage, setAppsPerPage] = useState(28); // 7 columns x 4 rows for desktop
+
+  // Update apps per page based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 375) {
+        setAppsPerPage(12); // 3 columns x 4 rows for extra small devices
+      } else if (window.innerWidth <= 768) {
+        setAppsPerPage(16); // 4 columns x 4 rows for mobile
+      } else if (window.innerWidth <= 1024) {
+        setAppsPerPage(20); // 5 columns x 4 rows for tablets
+      } else {
+        setAppsPerPage(28); // 7 columns x 4 rows for desktop
+      }
+    };
+
+    handleResize(); // Call once on mount
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Filter apps based on search query
   const filteredApps = apps.filter((app) =>
@@ -36,10 +56,12 @@ export default function Launchpad({
 
   const totalPages = Math.ceil(filteredApps.length / appsPerPage);
 
-  // Handle Escape key to close Launchpad or clear search
+  // Handle keyboard navigation for Launchpad
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
+      if (!isOpen) return;
+
+      if (e.key === "Escape") {
         if (searchQuery) {
           // If there's a search query, clear it first
           e.preventDefault();
@@ -49,12 +71,24 @@ export default function Launchpad({
           // Otherwise close the Launchpad
           onClose();
         }
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        // Navigate to next page
+        e.preventDefault();
+        if (currentPage < totalPages - 1) {
+          setCurrentPage(currentPage + 1);
+        }
+      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        // Navigate to previous page
+        e.preventDefault();
+        if (currentPage > 0) {
+          setCurrentPage(currentPage - 1);
+        }
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose, searchQuery]);
+  }, [isOpen, onClose, searchQuery, currentPage, totalPages]);
 
   // Handle app click
   const handleAppClick = (id: string, e: React.MouseEvent) => {
@@ -69,14 +103,11 @@ export default function Launchpad({
     (currentPage + 1) * appsPerPage
   );
 
-  // Reset to first page when search query changes
+  // Focus search input when Launchpad opens and reset page
   useEffect(() => {
-    setCurrentPage(0);
-  }, [searchQuery]);
-
-  // Focus search input when Launchpad opens
-  useEffect(() => {
-    if (isOpen && searchInputRef.current) {
+    if (isOpen) {
+      setCurrentPage(0);
+      setSearchQuery("");
       // Small delay to ensure the component is fully rendered
       setTimeout(() => {
         searchInputRef.current?.focus();
@@ -100,6 +131,8 @@ export default function Launchpad({
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+    // Reset to first page when search query changes
+    setCurrentPage(0);
   };
 
   return (
@@ -154,12 +187,12 @@ export default function Launchpad({
 
           {/* App grid - only show if we have results or no search query */}
           {(filteredApps.length > 0 || !searchQuery) && (
-            <div className="apps-grid">
+            <div className="launchpad-grid">
               {filteredApps.length > 0 ? (
-                filteredApps.map((app) => (
+                currentApps.map((app) => (
                   <motion.div
                     key={app.id}
-                    className="app-item"
+                    className="app-icon-container"
                     onClick={(e) => handleAppClick(app.id, e)}
                   >
                     <div className="app-icon">
@@ -190,9 +223,9 @@ export default function Launchpad({
                     key={index}
                     onClick={(e) => handlePageChange(index, e)}
                     className={`pagination-dot ${isActive ? "active" : ""}`}
-                  >
-                    {index + 1}
-                  </button>
+                    aria-label={`Page ${index + 1}`}
+                    title={`Page ${index + 1}`}
+                  />
                 );
               })}
             </div>
