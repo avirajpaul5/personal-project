@@ -13,6 +13,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { useTheme } from "../../contexts/ThemeContext";
+import { createPortal } from "react-dom";
 
 interface AppleMenuProps {
   isOpen: boolean;
@@ -132,7 +133,7 @@ export default function AppleMenu({
     }
   }, [isOpen, onClose]);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -141,8 +142,9 @@ export default function AppleMenu({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/5 backdrop-blur-[2px]"
+            className="fixed inset-0 z-[9999] bg-black/5 backdrop-blur-[2px]"
             onClick={onClose}
+            style={{ position: "fixed" }}
           />
           <motion.div
             ref={menuRef}
@@ -151,11 +153,12 @@ export default function AppleMenu({
             animate="animate"
             exit="exit"
             className={clsx(
-              "fixed top-7 left-4 z-50 w-72 rounded-lg shadow-xl overflow-hidden backdrop-blur-xl",
+              "fixed top-7 left-4 z-[9999] w-72 rounded-lg shadow-xl overflow-hidden backdrop-blur-xl",
               isDark
                 ? "bg-gray-800/90 shadow-black/20"
                 : "bg-white/90 shadow-black/10"
             )}
+            style={{ position: "fixed" }}
           >
             <div className="p-1">
               <motion.div
@@ -212,6 +215,7 @@ export default function AppleMenu({
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
