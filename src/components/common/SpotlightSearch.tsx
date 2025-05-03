@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useTheme } from "../../contexts/ThemeContext";
 import "../../styles/spotlight.css";
+import { createPortal } from "react-dom";
 
 interface SpotlightSearchProps {
   isOpen: boolean;
@@ -74,7 +75,7 @@ export default function SpotlightSearch({
     onClose();
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -82,10 +83,10 @@ export default function SpotlightSearch({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/20 dark:bg-black/40 backdrop-blur-sm z-[9999]"
             onClick={onClose}
           />
-          <div className="fixed inset-0 flex items-start justify-center pt-[10vh] sm:pt-[15vh] md:pt-[20vh] z-50 pointer-events-none">
+          <div className="fixed inset-0 flex items-start justify-center pt-[10vh] sm:pt-[15vh] md:pt-[20vh] z-[9999] pointer-events-none">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -177,6 +178,7 @@ export default function SpotlightSearch({
           </div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
