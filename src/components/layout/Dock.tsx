@@ -66,9 +66,7 @@ export default function Dock({
   const { mouseX, handleMouseMove, handleMouseLeave } = useDockMouseTracking();
 
   // Filter minimized apps that should be shown in dock
-  const minimizedApps = apps.filter(
-    (app) => app.isMinimized && app.showInDock !== false
-  );
+  const minimizedApps = apps.filter((app) => app.isMinimized);
 
   // Style for the dock - on mobile, it's just a circular button for Launchpad
   const dockStyle = isMobile

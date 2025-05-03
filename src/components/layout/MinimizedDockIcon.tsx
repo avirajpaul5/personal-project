@@ -74,7 +74,7 @@ export default function MinimizedDockIcon({
               onCloseApp(app.id);
             }}
             className={clsx(
-              "absolute -right-1 rounded-full flex items-center justify-center p-0.5",
+              "absolute -right-1 rounded-full flex items-center justify-center p-0.5 mt-1 mr-1",
               isMobile ? "-top-2 w-5 h-5" : "-top-1 w-4 h-4",
               "bg-red-500 hover:bg-red-600 text-white"
             )}
