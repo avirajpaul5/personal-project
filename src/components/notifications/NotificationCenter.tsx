@@ -116,10 +116,15 @@ export default function NotificationCenter({
 
         {/* Content area with widgets and Spotify embed */}
         <div className={`space-y-5 ${isMobile ? "flex-1 flex flex-col" : ""}`}>
-          <WorldClockWidget />
-          <WeatherWidget />
+          <div style={{ flex: isMobile ? "0 0 auto" : "none" }}>
+            <WorldClockWidget />
+          </div>
+          <div style={{ flex: isMobile ? "0 0 auto" : "none" }}>
+            <WeatherWidget />
+          </div>
           <div
             className={`mt-6 ${isMobile ? "flex-1 flex flex-col min-h-0" : ""}`}
+            style={{ flex: isMobile ? "1 0 auto" : "none" }}
           >
             <h3
               className={`font-bold mb-4 ${
@@ -129,7 +134,10 @@ export default function NotificationCenter({
               Music
             </h3>
             <div
-              style={{ height: isMobile ? "auto" : "360px" }}
+              style={{
+                height: isMobile ? "auto" : "360px",
+                minHeight: isMobile ? "400px" : "auto",
+              }}
               className={`border border-gray-100 dark:border-gray-700 rounded-xl overflow-hidden ${
                 isMobile ? "flex-1 min-h-0" : ""
               }`}
