@@ -154,51 +154,47 @@ export default function Launchpad({
 
           {/* App grid - only show if we have results or no search query */}
           {(filteredApps.length > 0 || !searchQuery) && (
-            <div className="launchpad-grid">
-              {currentApps.map((app) => (
-                <motion.div
-                  key={app.id}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{
-                    type: "spring",
-                    damping: 20,
-                    stiffness: 300,
-                    delay: Math.random() * 0.2,
-                  }}
-                  className="app-icon-container"
-                  onClick={(e) => handleAppClick(app.id, e)}
-                >
-                  <div className="app-icon">
-                    <img
-                      src={app.icon}
-                      alt={app.title}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <span className="app-title">{app.title}</span>
-                </motion.div>
-              ))
-            ) : (
-              <div className="col-span-full text-center text-white text-lg">
-                <p>No apps available</p>
-              </div>
-            )}
-          </div>
+            <div className="apps-grid">
+              {filteredApps.length > 0 ? (
+                filteredApps.map((app) => (
+                  <motion.div
+                    key={app.id}
+                    className="app-item"
+                    onClick={(e) => handleAppClick(app.id, e)}
+                  >
+                    <div className="app-icon">
+                      <img
+                        src={app.icon}
+                        alt={app.title}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <span className="app-title">{app.title}</span>
+                  </motion.div>
+                ))
+              ) : (
+                <div className="col-span-full text-center text-white text-lg">
+                  <p>No apps available</p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Pagination dots */}
           {totalPages > 1 && (
             <div className="pagination" onClick={(e) => e.stopPropagation()}>
-              {Array.from({ length: totalPages }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={(e) => handlePageChange(index, e)}
-                  className={clsx(
-                    "pagination-dot",
-                    currentPage === index ? "active" : ""
-                  )}
-                />
-              ))}
+              {Array.from({ length: totalPages }).map((_, index) => {
+                const isActive = currentPage === index;
+                return (
+                  <button
+                    key={index}
+                    onClick={(e) => handlePageChange(index, e)}
+                    className={`pagination-dot ${isActive ? "active" : ""}`}
+                  >
+                    {index + 1}
+                  </button>
+                );
+              })}
             </div>
           )}
         </motion.div>
