@@ -90,9 +90,8 @@ export default function Dock({
           isMobile ? "bottom-1" : "bottom-3",
           "flex items-center justify-center rounded-xl shadow-md",
           isMobile ? "p-0" : "px-3 py-2",
-          "backdrop-filter blur-16 saturate-180",
-          "-webkit-backdrop-filter blur-16 saturate-180",
-          "bg-[rgba(255,255,255,0.75)] border-[rgba(0,0,0,0.125)]"
+          "backdrop-blur-xl transition-colors duration-300",
+          isDark ? "bg-gray-900/30 text-gray-300" : "bg-white/50 text-gray-900"
         )}
       >
         <div className="flex items-center justify-center">
@@ -107,7 +106,12 @@ export default function Dock({
           {!isMobile && (
             <>
               {/* Divider after Launchpad */}
-              <div className="w-px h-9 mx-3 bg-white/30" />
+              <div
+                className={clsx(
+                  "w-px h-9 mx-3",
+                  isDark ? "bg-white/30" : "bg-black/20"
+                )}
+              />
 
               {/* Open Apps Section */}
               <div className="flex items-center space-x-3">
@@ -128,7 +132,12 @@ export default function Dock({
 
               {/* Divider */}
               {minimizedApps.length > 0 && (
-                <div className="w-px h-9 mx-3 bg-white/30" />
+                <div
+                  className={clsx(
+                    "w-px h-9 mx-3",
+                    isDark ? "bg-white/30" : "bg-black/20"
+                  )}
+                />
               )}
 
               {/* Minimized Apps Section - Lazy load minimized apps */}
