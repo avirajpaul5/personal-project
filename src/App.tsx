@@ -1,20 +1,26 @@
 // Import necessary dependencies and components
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Window as WindowType } from "./components/utils/types";
 import Window from "./components/layout/Window";
 import Dock from "./components/layout/Dock";
 import Navbar from "./components/layout/Navbar";
-import About from "./components/sections/About";
-import Projects from "./components/sections/Projects";
-import Contact from "./components/sections/Contact";
 import MacOSPreloader from "./components/common/Preloader";
-import SpotlightSearch from "./components/common/SpotlightSearch";
-import Launchpad from "./components/common/Launchpad";
-import Terminal from "./components/sections/Terminal";
-import WallpaperSelector from "./components/sections/WallpaperSelector";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 import { Toaster } from "sonner";
+
+// Lazy load components that aren't needed immediately
+const About = lazy(() => import("./components/sections/About"));
+const Projects = lazy(() => import("./components/sections/Projects"));
+const Contact = lazy(() => import("./components/sections/Contact"));
+const SpotlightSearch = lazy(
+  () => import("./components/common/SpotlightSearch")
+);
+const Launchpad = lazy(() => import("./components/common/Launchpad"));
+const Terminal = lazy(() => import("./components/sections/Terminal"));
+const WallpaperSelector = lazy(
+  () => import("./components/sections/WallpaperSelector")
+);
 
 // Import custom hooks
 import { useWindowManager } from "./hooks/useWindowManager";
@@ -177,17 +183,29 @@ function AppContent() {
           transition={{ duration: 0.8 }}
         >
           <Navbar openWindow={openWindow} />
-          <SpotlightSearch
-            isOpen={isSpotlightOpen}
-            onClose={closeSpotlight}
-            onAppClick={openWindow}
-          />
-          <Launchpad
-            isOpen={isLaunchpadOpen}
-            onClose={closeLaunchpad}
-            apps={windows}
-            onAppClick={openWindow}
-          />
+          <Suspense
+            fallback={
+              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"></div>
+            }
+          >
+            <SpotlightSearch
+              isOpen={isSpotlightOpen}
+              onClose={closeSpotlight}
+              onAppClick={openWindow}
+            />
+          </Suspense>
+          <Suspense
+            fallback={
+              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"></div>
+            }
+          >
+            <Launchpad
+              isOpen={isLaunchpadOpen}
+              onClose={closeLaunchpad}
+              apps={windows}
+              onAppClick={openWindow}
+            />
+          </Suspense>
           <div className="relative w-full h-full pt-7">
             {windows
               .filter((app) => app.isOpen && !app.isMinimized) // Only show open and non-minimized apps
@@ -214,7 +232,15 @@ function AppContent() {
                       onBodyClick={() => focusWindow(app.id)}
                       style={{ zIndex }}
                     >
-                      <Terminal onCommand={processCommand} />
+                      <Suspense
+                        fallback={
+                          <div className="flex items-center justify-center h-full">
+                            Loading...
+                          </div>
+                        }
+                      >
+                        <Terminal onCommand={processCommand} />
+                      </Suspense>
                     </Window>
                   );
                 }
@@ -238,7 +264,15 @@ function AppContent() {
                     onBodyClick={() => focusWindow(app.id)}
                     style={{ zIndex }}
                   >
-                    <AppComponent />
+                    <Suspense
+                      fallback={
+                        <div className="flex items-center justify-center h-full">
+                          Loading...
+                        </div>
+                      }
+                    >
+                      <AppComponent />
+                    </Suspense>
                   </Window>
                 );
               })}
