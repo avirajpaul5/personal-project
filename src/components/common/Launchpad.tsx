@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import clsx from "clsx";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Window } from "../utils/types";
 import { useTheme } from "../../contexts/ThemeContext";
 import { Search } from "lucide-react";
@@ -12,6 +11,41 @@ interface LaunchpadProps {
   apps: Window[];
   onAppClick: (id: string) => void;
 }
+
+// Animation variants for the app icons
+const gridContainerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.12, // Slightly increased stagger time
+      delayChildren: 0.02, // Start earlier
+      when: "beforeChildren", // Ensure container fades in before children start animating
+      duration: 0.2, // Container fade-in duration
+    },
+  },
+};
+
+const iconVariants: Variants = {
+  hidden: (index: number) => ({
+    opacity: 0,
+    scale: 0.8,
+    // Slightly different starting position based on index
+    y: 10 + (index % 3) * 5,
+  }),
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 230, // Reduced stiffness for slightly longer animation
+      damping: 18, // Reduced damping for a bit more bounce
+      duration: 0.4, // Increased duration
+      mass: 1.1, // Slightly increased mass for more momentum
+    },
+  },
+};
 
 export default function Launchpad({
   isOpen,
@@ -142,7 +176,7 @@ export default function Launchpad({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.25 }}
           className="launchpad-container"
           style={{ zIndex: 9999 }} // Ensure consistent z-index with CSS
           onClick={onClose} // Close when clicking anywhere
@@ -176,9 +210,16 @@ export default function Launchpad({
           {filteredApps.length === 0 && searchQuery && (
             <motion.div
               className="no-results"
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{
+                type: "spring",
+                stiffness: 230,
+                damping: 18,
+                duration: 0.4,
+                mass: 1.1,
+              }}
+              key={`no-results-${searchQuery}`}
             >
               <p className="text-white text-lg">
                 No results found for "{searchQuery}"
@@ -188,13 +229,21 @@ export default function Launchpad({
 
           {/* App grid - only show if we have results or no search query */}
           {(filteredApps.length > 0 || !searchQuery) && (
-            <div className="launchpad-grid">
+            <motion.div
+              className="launchpad-grid"
+              variants={gridContainerVariants}
+              initial="hidden"
+              animate="visible"
+              key={`grid-${currentPage}-${searchQuery}`} // Key to force re-animation when page or search changes
+            >
               {filteredApps.length > 0 ? (
-                currentApps.map((app) => (
+                currentApps.map((app, index) => (
                   <motion.div
                     key={app.id}
                     className="app-icon-container"
                     onClick={(e) => handleAppClick(app.id, e)}
+                    variants={iconVariants}
+                    custom={index}
                   >
                     <div className="app-icon">
                       <img
@@ -207,11 +256,14 @@ export default function Launchpad({
                   </motion.div>
                 ))
               ) : (
-                <div className="col-span-full text-center text-white text-lg">
+                <motion.div
+                  className="col-span-full text-center text-white text-lg"
+                  variants={iconVariants}
+                >
                   <p>No apps available</p>
-                </div>
+                </motion.div>
               )}
-            </div>
+            </motion.div>
           )}
 
           {/* Pagination dots */}
