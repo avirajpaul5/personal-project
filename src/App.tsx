@@ -263,15 +263,7 @@ function App() {
     <ThemeProvider>
       <SpotlightProvider>
         <AppContent />
-        <Toaster
-          position="top-right"
-          richColors
-          closeButton
-          toastOptions={{
-            // Prevent duplicate toasts with the same ID
-            id: (id) => id,
-          }}
-        />
+        <Toaster position="top-right" richColors closeButton />
       </SpotlightProvider>
     </ThemeProvider>
   );
