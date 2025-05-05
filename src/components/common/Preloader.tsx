@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
+import { getTimeBasedGreeting } from "../../utils/greetings";
 
 interface MacOSPreloaderProps {
   onFinish: () => void;
@@ -8,30 +10,37 @@ interface MacOSPreloaderProps {
 const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
-  const [greeting, setGreeting] = useState("");
-  const [quip, setQuip] = useState("");
+  const [imageRevealed, setImageRevealed] = useState(false);
+  // Use a ref instead of state to track if toast has been shown
+  const toastShownRef = useRef(false);
 
+  // Effect to handle progress updates
   useEffect(() => {
-    const hours = new Date().getHours();
-    if (hours >= 5 && hours < 12) {
-      setGreeting("Good morning ☀️");
-      setQuip("Seizing the day already? ☕");
-    } else if (hours >= 12 && hours < 17) {
-      setGreeting("Good afternoon 🌞");
-      setQuip("A productive break, or just some digital wandering? 👀💡");
-    } else if (hours >= 17 && hours < 21) {
-      setGreeting("Good evening 🌆");
-      setQuip("Still in the zone? Keep going. 🚀");
-    } else {
-      setGreeting("Hello, night owl 🌙");
-      setQuip("Burning the midnight oil? 🔥💻");
-    }
-
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
           setTimeout(() => {
+            // Only show toast if it hasn't been shown yet using ref
+            if (!toastShownRef.current) {
+              toastShownRef.current = true;
+              // Show toast notification with greeting after loading completes
+              const { greeting: timeGreeting, quip: timeQuip } =
+                getTimeBasedGreeting();
+              // Use a unique ID for the toast to prevent duplicates
+              toast(timeGreeting, {
+                id: "greeting-toast", // Add a unique ID
+                description: timeQuip,
+                duration: 5000,
+                icon: timeGreeting.includes("morning")
+                  ? "☀️"
+                  : timeGreeting.includes("afternoon")
+                  ? "🌞"
+                  : timeGreeting.includes("evening")
+                  ? "🌆"
+                  : "🌙",
+              });
+            }
             setLoading(false);
             onFinish();
           }, 800);
@@ -42,7 +51,14 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
     }, 40);
 
     return () => clearInterval(interval);
-  }, [onFinish]);
+  }, [onFinish]); // Remove toastShown from dependencies
+
+  // Separate effect to handle image reveal
+  useEffect(() => {
+    if (progress >= 30 && !imageRevealed) {
+      setImageRevealed(true);
+    }
+  }, [progress, imageRevealed]);
 
   return (
     <AnimatePresence>
@@ -54,38 +70,39 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
             transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
           }}
         >
-          {/* Spinner */}
-          <motion.div
-            className="mb-8"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.2, ease: "linear", repeat: Infinity }}
-          >
-            <svg width="40" height="40" viewBox="0 0 40 40">
-              <circle
-                cx="20"
-                cy="20"
-                r="18"
-                stroke="currentColor"
-                className="text-gray-200 dark:text-gray-700"
-                strokeWidth="2"
-                fill="none"
-              />
-              <motion.circle
-                cx="20"
-                cy="20"
-                r="18"
-                stroke="currentColor"
-                className="text-blue-500 dark:text-blue-400"
-                strokeWidth="3"
-                strokeLinecap="round"
-                fill="none"
-                strokeDasharray="113"
-                strokeDashoffset="113"
-                animate={{ strokeDashoffset: 0 }}
-                transition={{ duration: 1.5, ease: "linear", repeat: Infinity }}
-              />
-            </svg>
-          </motion.div>
+          {/* Image Reveal Animation */}
+          <div className="relative w-full max-w-lg mb-8">
+            <div className="relative overflow-hidden">
+              {/* Header */}
+              <div className="flex justify-between px-4 py-2 text-gray-800 dark:text-gray-200">
+                <span className="font-medium">Aviraj Paul</span>
+                <span className="font-medium">{Math.round(progress)}%</span>
+              </div>
+
+              {/* Image */}
+              <div className="relative aspect-video">
+                <img
+                  src="https://images.unsplash.com/photo-1682687982107-14492010e05e?q=80&w=1974&auto=format&fit=crop"
+                  alt="Aesthetic background"
+                  className="w-full h-full object-cover"
+                />
+
+                {/* Overlay that reveals the image */}
+                <motion.div
+                  className="absolute inset-0 bg-white dark:bg-gray-900 origin-bottom"
+                  initial={{ scaleY: 1 }}
+                  animate={{
+                    scaleY: imageRevealed ? 0 : 1,
+                    transition: {
+                      duration: 1.5,
+                      ease: [0.22, 1, 0.36, 1],
+                      delay: 0.3,
+                    },
+                  }}
+                />
+              </div>
+            </div>
+          </div>
 
           {/* Progress Bar */}
           <div className="w-64 h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -96,21 +113,17 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
               transition={{ ease: "easeOut", duration: 0.5 }}
             />
           </div>
-          <motion.p className="mt-2 text-xs text-gray-500 dark:text-gray-300 font-mono">
-            {Math.round(progress)}%
-          </motion.p>
 
-          {/* Greeting and Quip */}
+          {/* Loading message */}
           <motion.div
             className="text-center mt-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            <h1 className="text-gray-900 dark:text-gray-100 font-medium text-2xl">
-              {greeting}
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 text-base">{quip}</p>
+            <p className="text-gray-600 dark:text-gray-300 text-base">
+              Loading your experience...
+            </p>
           </motion.div>
         </motion.div>
       )}

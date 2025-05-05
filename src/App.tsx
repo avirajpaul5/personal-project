@@ -14,6 +14,7 @@ import Terminal from "./components/sections/Terminal";
 import WallpaperSelector from "./components/sections/WallpaperSelector";
 import { motion } from "framer-motion";
 import clsx from "clsx";
+import { Toaster } from "sonner";
 
 // Import custom hooks
 import { useWindowManager } from "./hooks/useWindowManager";
@@ -262,6 +263,15 @@ function App() {
     <ThemeProvider>
       <SpotlightProvider>
         <AppContent />
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          toastOptions={{
+            // Prevent duplicate toasts with the same ID
+            id: (id) => id,
+          }}
+        />
       </SpotlightProvider>
     </ThemeProvider>
   );
