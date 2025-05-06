@@ -2,6 +2,11 @@ import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { getTimeBasedGreeting } from "../../utils/greetings";
+import gsap from "gsap";
+import { SplitText } from "gsap/SplitText";
+
+// Register the SplitText plugin
+gsap.registerPlugin(SplitText);
 
 interface MacOSPreloaderProps {
   onFinish: () => void;
@@ -11,72 +16,200 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [imageRevealed, setImageRevealed] = useState(false);
-  // Use a ref instead of state to track if toast has been shown
+  const [percentageRevealed, setPercentageRevealed] = useState(false);
   const toastShownRef = useRef(false);
+
+  // Refs for text elements and their masks
+  const headerRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLSpanElement>(null);
+  const percentageRef = useRef<HTMLSpanElement>(null);
+  const nameMaskRef = useRef<HTMLDivElement>(null);
+  const percentageMaskRef = useRef<HTMLDivElement>(null);
+  const imageOverlayRef = useRef<HTMLDivElement>(null);
+
+  // Effect to handle initial text mask animation
+  useEffect(() => {
+    if (
+      nameRef.current &&
+      percentageRef.current &&
+      nameMaskRef.current &&
+      percentageMaskRef.current
+    ) {
+      // Create a timeline for both animations
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setPercentageRevealed(true);
+        },
+      });
+
+      // Animate the name mask from top to bottom
+      tl.fromTo(
+        nameMaskRef.current,
+        { scaleY: 1 },
+        {
+          scaleY: 0,
+          duration: 0.8,
+          ease: "power3.inOut",
+          transformOrigin: "top",
+        }
+      );
+
+      // Animate the percentage mask from top to bottom
+      tl.fromTo(
+        percentageMaskRef.current,
+        { scaleY: 1 },
+        {
+          scaleY: 0,
+          duration: 0.8,
+          ease: "power3.inOut",
+          transformOrigin: "top",
+        },
+        "-=0.6" // Start slightly before the name animation finishes
+      );
+    }
+  }, []);
 
   // Effect to handle progress updates
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 100) {
+        const newProgress = prev + Math.random() * 1.8 + 0.7;
+
+        if (newProgress >= 100) {
           clearInterval(interval);
-          setTimeout(() => {
-            // Only show toast if it hasn't been shown yet using ref
-            if (!toastShownRef.current) {
-              toastShownRef.current = true;
-              // Show toast notification with greeting after loading completes
-              const { greeting: timeGreeting, quip: timeQuip } =
-                getTimeBasedGreeting();
-              // Use a unique ID for the toast to prevent duplicates
-              toast(timeGreeting, {
-                id: "greeting-toast", // Add a unique ID
-                description: timeQuip,
-                duration: 5000,
-                icon: timeGreeting.includes("morning")
-                  ? "☀️"
-                  : timeGreeting.includes("afternoon")
-                  ? "🌞"
-                  : timeGreeting.includes("evening")
-                  ? "🌆"
-                  : "🌙",
-              });
-            }
-            setLoading(false);
-            onFinish();
-          }, 800);
+
+          // Animate out all elements together
+          if (
+            nameMaskRef.current &&
+            percentageMaskRef.current &&
+            imageOverlayRef.current
+          ) {
+            const timeline = gsap.timeline({
+              onComplete: () => {
+                // Show toast notification
+                if (!toastShownRef.current) {
+                  toastShownRef.current = true;
+                  const { greeting: timeGreeting, quip: timeQuip } =
+                    getTimeBasedGreeting();
+                  toast(timeGreeting, {
+                    id: "greeting-toast",
+                    description: timeQuip,
+                    duration: 5000,
+                    icon: timeGreeting.includes("morning")
+                      ? "☀️"
+                      : timeGreeting.includes("afternoon")
+                      ? "🌞"
+                      : timeGreeting.includes("evening")
+                      ? "🌆"
+                      : "🌙",
+                  });
+                }
+
+                // Set loading to false to trigger the AnimatePresence exit
+                // onFinish will be called by AnimatePresence's onExitComplete
+                setLoading(false);
+              },
+            });
+
+            // Make sure all elements are in their proper starting states
+
+            // Animate text masks from top to bottom
+            timeline.to([nameMaskRef.current, percentageMaskRef.current], {
+              scaleY: 1,
+              duration: 0.8,
+              ease: "power2.inOut",
+              transformOrigin: "bottom",
+            });
+
+            // Animate image overlay separately to ensure it works correctly
+            timeline.to(
+              imageOverlayRef.current,
+              {
+                scaleY: 1,
+                duration: 0.8,
+                ease: "power2.inOut",
+                transformOrigin: "bottom",
+              },
+              "<" // Start at the same time as the text masks
+            );
+          }
+
           return 100;
         }
-        return prev + Math.random() * 1.8 + 0.7;
+        return newProgress;
       });
     }, 40);
 
     return () => clearInterval(interval);
-  }, [onFinish]); // Remove toastShown from dependencies
+  }, [onFinish]);
+
+  // No additional animation for percentage updates - we'll let it update freely
 
   // Separate effect to handle image reveal
   useEffect(() => {
-    if (progress >= 30 && !imageRevealed) {
+    if (progress >= 30 && !imageRevealed && imageOverlayRef.current) {
       setImageRevealed(true);
+
+      // Animate the image reveal with GSAP
+      gsap.to(imageOverlayRef.current, {
+        scaleY: 0,
+        duration: 1.5,
+        ease: "power3.inOut",
+        delay: 0.3,
+      });
     }
   }, [progress, imageRevealed]);
 
   return (
-    <AnimatePresence>
+    <AnimatePresence
+      onExitComplete={() => {
+        // Call onFinish after the exit animation is complete
+        onFinish();
+      }}
+    >
       {loading && (
         <motion.div
           className="fixed inset-0 flex flex-col items-center justify-center bg-white dark:bg-gray-900 z-50"
           exit={{
             opacity: 0,
-            transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+            transition: {
+              duration: 0.8,
+              ease: [0.22, 1, 0.36, 1],
+              delay: 0.3, // Small delay to ensure animations complete
+            },
           }}
         >
           {/* Image Reveal Animation */}
           <div className="relative w-full max-w-lg mb-8">
             <div className="relative overflow-hidden">
               {/* Header */}
-              <div className="flex justify-between px-4 py-2 text-gray-800 dark:text-gray-200">
-                <span className="font-medium">Aviraj Paul</span>
-                <span className="font-medium">{Math.round(progress)}%</span>
+              <div
+                ref={headerRef}
+                className="flex justify-between px-4 py-2 text-gray-800 dark:text-gray-200"
+              >
+                {/* Name with mask */}
+                <div className="relative overflow-hidden">
+                  <span ref={nameRef} className="font-medium block">
+                    Aviraj Paul
+                  </span>
+                  <div
+                    ref={nameMaskRef}
+                    className="absolute inset-0 bg-white dark:bg-gray-900 transform-gpu"
+                    style={{ transformOrigin: "top" }}
+                  />
+                </div>
+
+                {/* Percentage with mask */}
+                <div className="relative overflow-hidden">
+                  <span ref={percentageRef} className="font-medium block">
+                    {Math.round(progress)}
+                  </span>
+                  <div
+                    ref={percentageMaskRef}
+                    className="absolute inset-0 bg-white dark:bg-gray-900 transform-gpu"
+                    style={{ transformOrigin: "top" }}
+                  />
+                </div>
               </div>
 
               {/* Image */}
@@ -87,17 +220,13 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
                   className="w-full h-full object-cover"
                 />
 
-                {/* Overlay that reveals the image */}
-                <motion.div
-                  className="absolute inset-0 bg-white dark:bg-gray-900 origin-bottom"
-                  initial={{ scaleY: 1 }}
-                  animate={{
-                    scaleY: imageRevealed ? 0 : 1,
-                    transition: {
-                      duration: 1.5,
-                      ease: [0.22, 1, 0.36, 1],
-                      delay: 0.3,
-                    },
+                {/* Overlay that reveals the image - top-to-bottom animation */}
+                <div
+                  ref={imageOverlayRef}
+                  className="absolute inset-0 bg-white dark:bg-gray-900 origin-top transform-gpu"
+                  style={{
+                    transformOrigin: "top",
+                    transform: "scaleY(1)", // Start with the overlay covering the image
                   }}
                 />
               </div>
