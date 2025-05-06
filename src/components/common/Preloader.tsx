@@ -47,7 +47,7 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
         { scaleY: 1 },
         {
           scaleY: 0,
-          duration: 0.8,
+          duration: 1,
           ease: "power3.inOut",
           transformOrigin: "top",
         }
@@ -72,23 +72,28 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
           ) {
             const timeline = gsap.timeline({
               onComplete: () => {
-                // Show toast notification
+                // Show toast notification with a 3-second delay
                 if (!toastShownRef.current) {
                   toastShownRef.current = true;
-                  const { greeting: timeGreeting, quip: timeQuip } =
-                    getTimeBasedGreeting();
-                  toast(timeGreeting, {
-                    id: "greeting-toast",
-                    description: timeQuip,
-                    duration: 5000,
-                    icon: timeGreeting.includes("morning")
-                      ? "☀️"
-                      : timeGreeting.includes("afternoon")
-                      ? "🌞"
-                      : timeGreeting.includes("evening")
-                      ? "🌆"
-                      : "🌙",
-                  });
+                  // Set the flag immediately to prevent multiple toasts
+
+                  // Delay the toast by 3 seconds
+                  setTimeout(() => {
+                    const { greeting: timeGreeting, quip: timeQuip } =
+                      getTimeBasedGreeting();
+                    toast(timeGreeting, {
+                      id: "greeting-toast",
+                      description: timeQuip,
+                      duration: 5000,
+                      icon: timeGreeting.includes("morning")
+                        ? "☀️"
+                        : timeGreeting.includes("afternoon")
+                        ? "🌞"
+                        : timeGreeting.includes("evening")
+                        ? "🌆"
+                        : "🌙",
+                    });
+                  }, 3000); // 3 seconds delay
                 }
 
                 // Set loading to false to trigger the AnimatePresence exit
