@@ -8,10 +8,6 @@ import { SplitText } from "gsap/SplitText";
 // Register the SplitText plugin
 gsap.registerPlugin(SplitText);
 
-interface MacOSPreloaderProps {
-  onFinish: () => void;
-}
-
 // Array of Unsplash portrait images for the burst animation
 const unsplashImages = [
   "https://images.unsplash.com/photo-1627668572787-ec918bede4ae?q=80&w=384&h=520&auto=format&fit=crop",
@@ -24,7 +20,15 @@ const unsplashImages = [
   "https://images.unsplash.com/photo-1729646063962-d711d75b9daa?q=80&w=384&h=520&auto=format&fit=crop",
 ];
 
-const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
+interface PreloaderProps {
+  onFinish: () => void;
+}
+
+/**
+ * Preloader component that displays a loading screen with animations
+ * before the main application is shown.
+ */
+const Preloader = ({ onFinish }: PreloaderProps) => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const toastShownRef = useRef(false);
@@ -40,56 +44,20 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
   // Refs for image elements
   const imageRefs = useRef<(HTMLImageElement | null)[]>([]);
 
-  // Create a burst timeline ref
-  const burstTimelineRef = useRef<gsap.core.Timeline | null>(null);
-
-  // Effect to handle initial animation and setup the image burst
-  useEffect(() => {
-    if (
-      nameRef.current &&
-      percentageRef.current &&
-      nameMaskRef.current &&
-      percentageMaskRef.current &&
-      imageOverlayRef.current &&
-      imageRefs.current.length === unsplashImages.length
-    ) {
-      // Hide all images initially except the first one
-      imageRefs.current.forEach((img, i) => {
-        if (img) {
-          gsap.set(img, { opacity: i === 0 ? 1 : 0 });
-        }
-      });
-
-      // Create the initial reveal timeline
-      const revealTl = gsap.timeline();
-
-      // Animate all elements simultaneously from top to bottom for initial reveal
-      revealTl.fromTo(
-        [
-          nameMaskRef.current,
-          percentageMaskRef.current,
-          imageOverlayRef.current,
-        ],
-        { scaleY: 1 },
-        {
-          scaleY: 0,
-          duration: 0.8,
-          ease: "power2.inOut",
-          transformOrigin: "top",
-          onComplete: () => {
-            // Start the image burst after the initial reveal
-            startImageBurst();
-          },
-        }
-      );
-    }
-  }, []);
+  // Function to initialize images
+  const initializeImages = () => {
+    // Hide all images initially except the first one
+    imageRefs.current.forEach((img, i) => {
+      if (img) {
+        gsap.set(img, { opacity: i === 0 ? 1 : 0 });
+      }
+    });
+  };
 
   // Function to start the image burst animation
-  const startImageBurst = () => {
+  const startBurst = () => {
     // Create a new timeline for the burst
     const burstTl = gsap.timeline();
-    burstTimelineRef.current = burstTl;
 
     // Set up rapid transitions between images
     const imgElements = imageRefs.current.filter(Boolean) as HTMLImageElement[];
@@ -100,7 +68,6 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
     });
 
     // Calculate exactly how many transitions we need to end on the last image
-    // We want to cycle through all images and end on the last one
     const totalTransitions = imgElements.length; // Just one full cycle
 
     // Set up timeline for sequential image changes - exactly one full cycle
@@ -126,12 +93,80 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
     }
   };
 
-  // Effect to handle progress and ensure we show the last image for exit transition
+  // Function to create reveal timeline
+  const createRevealTimeline = () => {
+    if (
+      !nameMaskRef.current ||
+      !percentageMaskRef.current ||
+      !imageOverlayRef.current
+    ) {
+      return null;
+    }
+
+    // Create the initial reveal timeline
+    const revealTl = gsap.timeline();
+
+    // Animate all elements simultaneously from top to bottom for initial reveal
+    revealTl.fromTo(
+      [nameMaskRef.current, percentageMaskRef.current, imageOverlayRef.current],
+      { scaleY: 1 },
+      {
+        scaleY: 0,
+        duration: 0.8,
+        ease: "power2.inOut",
+        transformOrigin: "top",
+        onComplete: () => startBurst(),
+      }
+    );
+
+    return revealTl;
+  };
+
+  // Function to create exit timeline
+  const createExitTimeline = (onComplete: () => void) => {
+    if (
+      !nameMaskRef.current ||
+      !percentageMaskRef.current ||
+      !imageOverlayRef.current
+    ) {
+      return null;
+    }
+
+    const timeline = gsap.timeline({
+      onComplete,
+    });
+
+    // Animate all elements together from bottom to top (for exit)
+    timeline.to(
+      [nameMaskRef.current, percentageMaskRef.current, imageOverlayRef.current],
+      {
+        scaleY: 1,
+        duration: 0.8,
+        ease: "power2.inOut",
+        transformOrigin: "bottom",
+      }
+    );
+
+    return timeline;
+  };
+
+  // Effect to handle initial animation and setup the image burst
   useEffect(() => {
-    // The burst animation will already be complete and showing the last image
-    // We don't need to stop it manually as it's a defined sequence
-    // This effect remains here in case you want to add any progress-related logic later
-  }, [progress]);
+    if (
+      nameRef.current &&
+      percentageRef.current &&
+      nameMaskRef.current &&
+      percentageMaskRef.current &&
+      imageOverlayRef.current &&
+      imageRefs.current.length === unsplashImages.length
+    ) {
+      // Initialize images
+      initializeImages();
+
+      // Create and play the reveal timeline
+      createRevealTimeline();
+    }
+  }, []);
 
   // Effect to handle progress updates
   useEffect(() => {
@@ -142,59 +177,34 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
         if (newProgress >= 100) {
           clearInterval(interval);
 
-          // Animate out all elements together
-          if (
-            nameMaskRef.current &&
-            percentageMaskRef.current &&
-            imageOverlayRef.current
-          ) {
-            const timeline = gsap.timeline({
-              onComplete: () => {
-                // Show toast notification with a 3-second delay
-                if (!toastShownRef.current) {
-                  toastShownRef.current = true;
-                  // Set the flag immediately to prevent multiple toasts
+          // Create and play the exit timeline
+          createExitTimeline(() => {
+            // Show toast notification with a 3-second delay
+            if (!toastShownRef.current) {
+              toastShownRef.current = true;
 
-                  // Delay the toast by 3 seconds
-                  setTimeout(() => {
-                    const { greeting: timeGreeting, quip: timeQuip } =
-                      getTimeBasedGreeting();
-                    toast(timeGreeting, {
-                      id: "greeting-toast",
-                      description: timeQuip,
-                      duration: 5000,
-                      icon: timeGreeting.includes("morning")
-                        ? "☀️"
-                        : timeGreeting.includes("afternoon")
-                        ? "🌞"
-                        : timeGreeting.includes("evening")
-                        ? "🌆"
-                        : "🌙",
-                    });
-                  }, 3000); // 3 seconds delay
-                }
+              // Delay the toast by 3 seconds
+              setTimeout(() => {
+                const { greeting: timeGreeting, quip: timeQuip } =
+                  getTimeBasedGreeting();
+                toast(timeGreeting, {
+                  id: "greeting-toast",
+                  description: timeQuip,
+                  duration: 5000,
+                  icon: timeGreeting.includes("morning")
+                    ? "☀️"
+                    : timeGreeting.includes("afternoon")
+                    ? "🌞"
+                    : timeGreeting.includes("evening")
+                    ? "🌆"
+                    : "🌙",
+                });
+              }, 3000); // 3 seconds delay
+            }
 
-                // Set loading to false to trigger the AnimatePresence exit
-                // onFinish will be called by AnimatePresence's onExitComplete
-                setLoading(false);
-              },
-            });
-
-            // Animate all elements together from bottom to top (for exit)
-            timeline.to(
-              [
-                nameMaskRef.current,
-                percentageMaskRef.current,
-                imageOverlayRef.current,
-              ],
-              {
-                scaleY: 1,
-                duration: 0.8,
-                ease: "power2.inOut",
-                transformOrigin: "bottom",
-              }
-            );
-          }
+            // Set loading to false to trigger the AnimatePresence exit
+            setLoading(false);
+          });
 
           return 100;
         }
@@ -203,7 +213,7 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
     }, 40);
 
     return () => clearInterval(interval);
-  }, [onFinish]);
+  }, []);
 
   return (
     <AnimatePresence
@@ -317,4 +327,4 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
   );
 };
 
-export default MacOSPreloader;
+export default Preloader;
