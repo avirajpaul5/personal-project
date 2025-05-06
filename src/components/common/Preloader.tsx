@@ -12,16 +12,16 @@ interface MacOSPreloaderProps {
   onFinish: () => void;
 }
 
-// Array of Unsplash images for the burst animation
+// Array of Unsplash portrait images for the burst animation
 const unsplashImages = [
-  "https://images.unsplash.com/photo-1682687982107-14492010e05e?q=80&w=1974&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1974&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?q=80&w=1974&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1974&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1511884642898-4c92249e20b6?q=80&w=1974&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?q=80&w=1974&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=1974&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=80&w=1974&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1627668572787-ec918bede4ae?q=80&w=384&h=520&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1515592565726-1356b4a020a6?q=80&w=384&h=520&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1641744473937-320ab5e7c035?q=80&w=384&h=520&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1696961305234-c56d9af60e34?q=80&w=384&h=520&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1730014393053-f5754fb19df5?q=80&w=384&h=520&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1617278735792-0ab0caff326a?q=80&w=384&h=520&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1650418988726-a03b31e504e3?q=80&w=384&h=520&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1729646063962-d711d75b9daa?q=80&w=384&h=520&auto=format&fit=crop",
 ];
 
 const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
@@ -225,7 +225,7 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
           }}
         >
           {/* Image Reveal Animation */}
-          <div className="relative w-full max-w-lg mb-8">
+          <div className="relative w-full max-w-[250px] mb-8">
             <div className="relative overflow-hidden">
               {/* Header */}
               <div
@@ -257,8 +257,8 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
                 </div>
               </div>
 
-              {/* Image Container - Multiple images for burst effect */}
-              <div className="relative aspect-video">
+              {/* Image Container - Multiple portrait images for burst effect */}
+              <div className="relative aspect-[384/520]">
                 {/* Stack all images with absolute positioning */}
                 {unsplashImages.map((img, index) => (
                   <img
@@ -279,10 +279,11 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
                 {/* Overlay that reveals the image - synchronized with text animations */}
                 <div
                   ref={imageOverlayRef}
-                  className="absolute inset-0 bg-white dark:bg-gray-900 transform-gpu z-50"
+                  className="absolute inset-0 bg-white dark:bg-gray-900 transform-gpu z-50 w-[101%] h-full"
                   style={{
                     transformOrigin: "top",
                     transform: "scaleY(1)", // Start with the overlay covering the image
+                    right: "-1%", // Shift 1% to the right
                   }}
                 />
               </div>
