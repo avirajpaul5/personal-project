@@ -12,12 +12,24 @@ interface MacOSPreloaderProps {
   onFinish: () => void;
 }
 
+// Array of Unsplash images for the burst animation
+const unsplashImages = [
+  "https://images.unsplash.com/photo-1682687982107-14492010e05e?q=80&w=1974&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1974&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?q=80&w=1974&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1974&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1511884642898-4c92249e20b6?q=80&w=1974&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?q=80&w=1974&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=1974&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=80&w=1974&auto=format&fit=crop",
+];
+
 const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const toastShownRef = useRef(false);
 
-  // Refs for text elements and their masks
+  // Refs for animation elements
   const headerRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLSpanElement>(null);
   const percentageRef = useRef<HTMLSpanElement>(null);
@@ -25,20 +37,34 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
   const percentageMaskRef = useRef<HTMLDivElement>(null);
   const imageOverlayRef = useRef<HTMLDivElement>(null);
 
-  // Effect to handle initial animation of all elements (name, percentage, and image)
+  // Refs for image elements
+  const imageRefs = useRef<(HTMLImageElement | null)[]>([]);
+
+  // Create a burst timeline ref
+  const burstTimelineRef = useRef<gsap.core.Timeline | null>(null);
+
+  // Effect to handle initial animation and setup the image burst
   useEffect(() => {
     if (
       nameRef.current &&
       percentageRef.current &&
       nameMaskRef.current &&
       percentageMaskRef.current &&
-      imageOverlayRef.current
+      imageOverlayRef.current &&
+      imageRefs.current.length === unsplashImages.length
     ) {
-      // Create a timeline for all animations
-      const tl = gsap.timeline();
+      // Hide all images initially except the first one
+      imageRefs.current.forEach((img, i) => {
+        if (img) {
+          gsap.set(img, { opacity: i === 0 ? 1 : 0 });
+        }
+      });
 
-      // Animate all elements simultaneously from top to bottom
-      tl.fromTo(
+      // Create the initial reveal timeline
+      const revealTl = gsap.timeline();
+
+      // Animate all elements simultaneously from top to bottom for initial reveal
+      revealTl.fromTo(
         [
           nameMaskRef.current,
           percentageMaskRef.current,
@@ -47,13 +73,65 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
         { scaleY: 1 },
         {
           scaleY: 0,
-          duration: 1,
-          ease: "power3.inOut",
+          duration: 0.8,
+          ease: "power2.inOut",
           transformOrigin: "top",
+          onComplete: () => {
+            // Start the image burst after the initial reveal
+            startImageBurst();
+          },
         }
       );
     }
   }, []);
+
+  // Function to start the image burst animation
+  const startImageBurst = () => {
+    // Create a new timeline for the burst
+    const burstTl = gsap.timeline();
+    burstTimelineRef.current = burstTl;
+
+    // Set up rapid transitions between images
+    const imgElements = imageRefs.current.filter(Boolean) as HTMLImageElement[];
+
+    // First hide all images except the first one (to ensure we start clean)
+    imgElements.forEach((img, idx) => {
+      gsap.set(img, { opacity: idx === 0 ? 1 : 0 });
+    });
+
+    // Calculate exactly how many transitions we need to end on the last image
+    // We want to cycle through all images and end on the last one
+    const totalTransitions = imgElements.length; // Just one full cycle
+
+    // Set up timeline for sequential image changes - exactly one full cycle
+    for (let i = 0; i < totalTransitions; i++) {
+      const currentIndex = i % imgElements.length;
+      const prevIndex = i === 0 ? 0 : (i - 1) % imgElements.length;
+
+      // Only hide previous if it's not the first transition
+      if (i > 0) {
+        burstTl.to(
+          imgElements[prevIndex],
+          { opacity: 0, duration: 0 },
+          i * 0.3
+        );
+      }
+
+      // Show current image
+      burstTl.to(
+        imgElements[currentIndex],
+        { opacity: 1, duration: 0 },
+        i * 0.3
+      );
+    }
+  };
+
+  // Effect to handle progress and ensure we show the last image for exit transition
+  useEffect(() => {
+    // The burst animation will already be complete and showing the last image
+    // We don't need to stop it manually as it's a defined sequence
+    // This effect remains here in case you want to add any progress-related logic later
+  }, [progress]);
 
   // Effect to handle progress updates
   useEffect(() => {
@@ -127,8 +205,6 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
     return () => clearInterval(interval);
   }, [onFinish]);
 
-  // No additional animation for percentage updates - we'll let it update freely
-
   return (
     <AnimatePresence
       onExitComplete={() => {
@@ -181,18 +257,29 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
                 </div>
               </div>
 
-              {/* Image */}
+              {/* Image Container - Multiple images for burst effect */}
               <div className="relative aspect-video">
-                <img
-                  src="https://images.unsplash.com/photo-1682687982107-14492010e05e?q=80&w=1974&auto=format&fit=crop"
-                  alt="Aesthetic background"
-                  className="w-full h-full object-cover"
-                />
+                {/* Stack all images with absolute positioning */}
+                {unsplashImages.map((img, index) => (
+                  <img
+                    key={img}
+                    ref={(el) => {
+                      imageRefs.current[index] = el;
+                    }}
+                    src={img}
+                    alt={`Aesthetic background ${index + 1}`}
+                    className="w-full h-full object-cover absolute inset-0"
+                    style={{
+                      opacity: index === 0 ? 1 : 0, // Only show the first image initially
+                      zIndex: 10 + index, // Ensure proper stacking
+                    }}
+                  />
+                ))}
 
                 {/* Overlay that reveals the image - synchronized with text animations */}
                 <div
                   ref={imageOverlayRef}
-                  className="absolute inset-0 bg-white dark:bg-gray-900 transform-gpu"
+                  className="absolute inset-0 bg-white dark:bg-gray-900 transform-gpu z-50"
                   style={{
                     transformOrigin: "top",
                     transform: "scaleY(1)", // Start with the overlay covering the image
