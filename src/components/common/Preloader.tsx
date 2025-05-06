@@ -15,8 +15,6 @@ interface MacOSPreloaderProps {
 const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
-  const [imageRevealed, setImageRevealed] = useState(false);
-  const [percentageRevealed, setPercentageRevealed] = useState(false);
   const toastShownRef = useRef(false);
 
   // Refs for text elements and their masks
@@ -27,24 +25,25 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
   const percentageMaskRef = useRef<HTMLDivElement>(null);
   const imageOverlayRef = useRef<HTMLDivElement>(null);
 
-  // Effect to handle initial text mask animation
+  // Effect to handle initial animation of all elements (name, percentage, and image)
   useEffect(() => {
     if (
       nameRef.current &&
       percentageRef.current &&
       nameMaskRef.current &&
-      percentageMaskRef.current
+      percentageMaskRef.current &&
+      imageOverlayRef.current
     ) {
-      // Create a timeline for both animations
-      const tl = gsap.timeline({
-        onComplete: () => {
-          setPercentageRevealed(true);
-        },
-      });
+      // Create a timeline for all animations
+      const tl = gsap.timeline();
 
-      // Animate the name mask from top to bottom
+      // Animate all elements simultaneously from top to bottom
       tl.fromTo(
-        nameMaskRef.current,
+        [
+          nameMaskRef.current,
+          percentageMaskRef.current,
+          imageOverlayRef.current,
+        ],
         { scaleY: 1 },
         {
           scaleY: 0,
@@ -52,19 +51,6 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
           ease: "power3.inOut",
           transformOrigin: "top",
         }
-      );
-
-      // Animate the percentage mask from top to bottom
-      tl.fromTo(
-        percentageMaskRef.current,
-        { scaleY: 1 },
-        {
-          scaleY: 0,
-          duration: 0.8,
-          ease: "power3.inOut",
-          transformOrigin: "top",
-        },
-        "-=0.6" // Start slightly before the name animation finishes
       );
     }
   }, []);
@@ -111,26 +97,19 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
               },
             });
 
-            // Make sure all elements are in their proper starting states
-
-            // Animate text masks from top to bottom
-            timeline.to([nameMaskRef.current, percentageMaskRef.current], {
-              scaleY: 1,
-              duration: 0.8,
-              ease: "power2.inOut",
-              transformOrigin: "bottom",
-            });
-
-            // Animate image overlay separately to ensure it works correctly
+            // Animate all elements together from bottom to top (for exit)
             timeline.to(
-              imageOverlayRef.current,
+              [
+                nameMaskRef.current,
+                percentageMaskRef.current,
+                imageOverlayRef.current,
+              ],
               {
                 scaleY: 1,
                 duration: 0.8,
                 ease: "power2.inOut",
                 transformOrigin: "bottom",
-              },
-              "<" // Start at the same time as the text masks
+              }
             );
           }
 
@@ -144,21 +123,6 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
   }, [onFinish]);
 
   // No additional animation for percentage updates - we'll let it update freely
-
-  // Separate effect to handle image reveal
-  useEffect(() => {
-    if (progress >= 30 && !imageRevealed && imageOverlayRef.current) {
-      setImageRevealed(true);
-
-      // Animate the image reveal with GSAP
-      gsap.to(imageOverlayRef.current, {
-        scaleY: 0,
-        duration: 1.5,
-        ease: "power3.inOut",
-        delay: 0.3,
-      });
-    }
-  }, [progress, imageRevealed]);
 
   return (
     <AnimatePresence
@@ -220,10 +184,10 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
                   className="w-full h-full object-cover"
                 />
 
-                {/* Overlay that reveals the image - top-to-bottom animation */}
+                {/* Overlay that reveals the image - synchronized with text animations */}
                 <div
                   ref={imageOverlayRef}
-                  className="absolute inset-0 bg-white dark:bg-gray-900 origin-top transform-gpu"
+                  className="absolute inset-0 bg-white dark:bg-gray-900 transform-gpu"
                   style={{
                     transformOrigin: "top",
                     transform: "scaleY(1)", // Start with the overlay covering the image
