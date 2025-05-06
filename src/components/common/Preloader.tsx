@@ -233,7 +233,7 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
                 className="flex justify-between px-4 py-2 text-gray-800 dark:text-gray-200"
               >
                 {/* Name with mask */}
-                <div className="relative overflow-hidden">
+                <div className="relative overflow-hidden -ml-4">
                   <span ref={nameRef} className="font-medium block">
                     Aviraj Paul
                   </span>
@@ -245,7 +245,7 @@ const MacOSPreloader = ({ onFinish }: MacOSPreloaderProps) => {
                 </div>
 
                 {/* Percentage with mask */}
-                <div className="relative overflow-hidden">
+                <div className="relative overflow-hidden -mr-3">
                   <span ref={percentageRef} className="font-medium block">
                     {Math.round(progress)}
                   </span>
