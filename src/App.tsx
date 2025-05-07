@@ -8,6 +8,7 @@ import MacOSPreloader from "./components/common/Preloader";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 import { Toaster } from "sonner";
+import { preloadEssentialComponents } from "./utils/preloader";
 
 // Lazy load components that aren't needed immediately
 const About = lazy(() => import("./components/sections/About"));
@@ -150,14 +151,41 @@ function AppContent() {
   } = useWindowManager(initialApps);
   const { processCommand } = useTerminal(openWindow);
 
-  // Effect hook for initial loading
+  // Effect hook for initial loading with Promise-based component preloading
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 3800);
+    // Preload essential components before finishing the loading screen
+    const preloadComponents = async () => {
+      try {
+        // Preload essential components (Navbar, Dock, etc.)
+        await preloadEssentialComponents(initialApps);
 
-    return () => clearTimeout(timer);
+        // Wait for the minimum preloader animation time (3.8 seconds)
+        // This ensures the preloader animation completes properly
+        const minLoadingTime = 3800;
+        const startTime = Date.now();
+        const timeElapsed = Date.now() - startTime;
+
+        if (timeElapsed < minLoadingTime) {
+          await new Promise((resolve) =>
+            setTimeout(resolve, minLoadingTime - timeElapsed)
+          );
+        }
+
+        // Only set loading to false after both preloading is complete
+        // and minimum animation time has passed
+        setLoading(false);
+      } catch (error) {
+        console.error("Error preloading components:", error);
+        // Fallback to finish loading even if there's an error
+        setLoading(false);
+      }
+    };
+
+    preloadComponents();
   }, []);
+
+  // State to track preloader exit animation
+  const [preloaderExiting, setPreloaderExiting] = useState(false);
 
   // Render the main app component
   return (
@@ -173,85 +201,57 @@ function AppContent() {
         backgroundColor: isDark ? "#111827" : "#ffffff",
       }}
     >
-      {loading ? (
-        <MacOSPreloader onFinish={() => setLoading(false)} />
-      ) : (
-        // Fade in the main content for a subtle, classy transition.
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
+      {/* Main content - always rendered but initially invisible */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{
+          opacity: loading && !preloaderExiting ? 0 : 1,
+        }}
+        transition={{
+          duration: 0.8,
+          // Start fading in as soon as preloader starts exiting
+          ease: "easeInOut",
+        }}
+        className="h-full"
+      >
+        <Navbar openWindow={openWindow} />
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"></div>
+          }
         >
-          <Navbar openWindow={openWindow} />
-          <Suspense
-            fallback={
-              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"></div>
-            }
-          >
-            <SpotlightSearch
-              isOpen={isSpotlightOpen}
-              onClose={closeSpotlight}
-              onAppClick={openWindow}
-            />
-          </Suspense>
-          <Suspense
-            fallback={
-              <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"></div>
-            }
-          >
-            <Launchpad
-              isOpen={isLaunchpadOpen}
-              onClose={closeLaunchpad}
-              apps={windows}
-              onAppClick={openWindow}
-            />
-          </Suspense>
-          <div className="relative w-full h-full pt-7">
-            {windows
-              .filter((app) => app.isOpen && !app.isMinimized) // Only show open and non-minimized apps
-              .sort((a, b) => a.lastActive - b.lastActive) // Sort by lastActive (oldest first)
-              .map((app, index) => {
-                // Calculate zIndex based on index
-                const zIndex = 1000 + index;
-                // Special handling for terminal
-                if (app.id === "terminal") {
-                  return (
-                    <Window
-                      key={app.id}
-                      title={app.title}
-                      isOpen={app.isOpen && !app.isMinimized}
-                      isMaximized={app.isMaximized}
-                      x={app.x}
-                      y={app.y}
-                      onPositionChange={(newX, newY) =>
-                        updatePosition(app.id, newX, newY)
-                      }
-                      onClose={() => closeWindow(app.id)}
-                      onMinimize={() => minimizeWindow(app.id)}
-                      onMaximize={() => toggleMaximize(app.id)}
-                      onBodyClick={() => focusWindow(app.id)}
-                      style={{ zIndex }}
-                    >
-                      <Suspense
-                        fallback={
-                          <div className="flex items-center justify-center h-full">
-                            Loading...
-                          </div>
-                        }
-                      >
-                        <Terminal onCommand={processCommand} />
-                      </Suspense>
-                    </Window>
-                  );
-                }
-
-                // For other apps
-                const AppComponent = app.component;
+          <SpotlightSearch
+            isOpen={isSpotlightOpen}
+            onClose={closeSpotlight}
+            onAppClick={openWindow}
+          />
+        </Suspense>
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"></div>
+          }
+        >
+          <Launchpad
+            isOpen={isLaunchpadOpen}
+            onClose={closeLaunchpad}
+            apps={windows}
+            onAppClick={openWindow}
+          />
+        </Suspense>
+        <div className="relative w-full h-full pt-7">
+          {windows
+            .filter((app) => app.isOpen && !app.isMinimized) // Only show open and non-minimized apps
+            .sort((a, b) => a.lastActive - b.lastActive) // Sort by lastActive (oldest first)
+            .map((app, index) => {
+              // Calculate zIndex based on index
+              const zIndex = 1000 + index;
+              // Special handling for terminal
+              if (app.id === "terminal") {
                 return (
                   <Window
                     key={app.id}
                     title={app.title}
-                    isOpen={app.isOpen}
+                    isOpen={app.isOpen && !app.isMinimized}
                     isMaximized={app.isMaximized}
                     x={app.x}
                     y={app.y}
@@ -271,21 +271,69 @@ function AppContent() {
                         </div>
                       }
                     >
-                      <AppComponent />
+                      <Terminal onCommand={processCommand} />
                     </Suspense>
                   </Window>
                 );
-              })}
-          </div>
-          <Dock
-            apps={windows}
-            onAppClick={openWindow}
-            onMinimizeApp={minimizeAndCloseWindow}
-            onRestoreApp={restoreWindow}
-            onCloseApp={closeWindowCompletely}
-            onLaunchpadClick={toggleLaunchpad}
+              }
+
+              // For other apps
+              const AppComponent = app.component;
+              return (
+                <Window
+                  key={app.id}
+                  title={app.title}
+                  isOpen={app.isOpen}
+                  isMaximized={app.isMaximized}
+                  x={app.x}
+                  y={app.y}
+                  onPositionChange={(newX, newY) =>
+                    updatePosition(app.id, newX, newY)
+                  }
+                  onClose={() => closeWindow(app.id)}
+                  onMinimize={() => minimizeWindow(app.id)}
+                  onMaximize={() => toggleMaximize(app.id)}
+                  onBodyClick={() => focusWindow(app.id)}
+                  style={{ zIndex }}
+                >
+                  <Suspense
+                    fallback={
+                      <div className="flex items-center justify-center h-full">
+                        Loading...
+                      </div>
+                    }
+                  >
+                    <AppComponent />
+                  </Suspense>
+                </Window>
+              );
+            })}
+        </div>
+        <Dock
+          apps={windows}
+          onAppClick={openWindow}
+          onMinimizeApp={minimizeAndCloseWindow}
+          onRestoreApp={restoreWindow}
+          onCloseApp={closeWindowCompletely}
+          onLaunchpadClick={toggleLaunchpad}
+        />
+      </motion.div>
+
+      {/* Preloader - only rendered when loading is true */}
+      {loading && (
+        <div className="fixed inset-0 z-50">
+          <MacOSPreloader
+            onFinish={() => {
+              // Signal that preloader is starting to exit
+              setPreloaderExiting(true);
+              // After a delay matching the preloader's exit animation duration,
+              // complete the loading state change
+              setTimeout(() => {
+                setLoading(false);
+              }, 800); // Match the duration of the preloader exit animation
+            }}
           />
-        </motion.div>
+        </div>
       )}
     </div>
   );

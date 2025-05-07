@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { useDockIconAnimation } from "../../hooks/useDockAnimation";
 import { MotionValue } from "framer-motion";
 import { useTheme } from "../../contexts/ThemeContext";
-import { useState, useEffect } from "react";
+import { useMobileDetection } from "../../hooks/useMobileDetection";
 
 /**
  * LaunchpadIcon component props interface
@@ -25,18 +25,8 @@ export default function LaunchpadIcon({
   // Use the dock icon animation hook
   const { ref, scale, y } = useDockIconAnimation(mouseX);
 
-  // State to track if we're on a mobile device
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  // Effect to handle window resize
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  // Use the shared mobile detection hook
+  const isMobile = useMobileDetection();
 
   return (
     <motion.div
@@ -45,6 +35,7 @@ export default function LaunchpadIcon({
         scale,
         y,
         transformOrigin: "bottom center",
+        willChange: "transform, opacity", // Optimize for GPU acceleration
       }}
       className="relative group"
     >

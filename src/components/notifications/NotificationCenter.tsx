@@ -6,6 +6,7 @@ import { WeatherWidget, WorldClockWidget } from "../widgets";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { useTheme } from "../../contexts/ThemeContext";
 import { createPortal } from "react-dom";
+import { useMobileDetection } from "../../hooks/useMobileDetection";
 
 // Define props interface for NotificationCenter component
 interface NotificationCenterProps {
@@ -27,18 +28,8 @@ export default function NotificationCenter({
   // Get the current theme
   const { isDark } = useTheme();
 
-  // State to track if we're on a mobile device
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  // Effect to handle window resize
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  // Use the shared mobile detection hook
+  const isMobile = useMobileDetection();
 
   // Effect to handle clicks outside the notification center
   useEffect(() => {

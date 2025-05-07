@@ -5,9 +5,7 @@ import { useDockIconAnimation } from "../../hooks/useDockAnimation";
 import { MotionValue } from "framer-motion";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useState, useEffect } from "react";
-
-// Image cache to store loaded images
-const imageCache = new Map<string, HTMLImageElement>();
+import { imageCache } from "../../utils/preloader";
 
 /**
  * DockIcon component props interface
@@ -57,7 +55,7 @@ export default function DockIcon({
         scale,
         y,
         transformOrigin: "bottom center",
-        willChange: "transform", // Optimize for GPU acceleration
+        willChange: "transform, opacity", // Optimize for GPU acceleration
       }}
       className="relative group"
     >

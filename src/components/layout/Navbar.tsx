@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { useTheme } from "../../contexts/ThemeContext";
 import { Search, Battery, Wifi, LayoutGrid } from "lucide-react";
 import { useSpotlight } from "../../contexts/SpotlightContext";
+import { useMobileDetection } from "../../hooks/useMobileDetection";
 
 interface NavbarProps {
   openWindow: (id: string) => void;
@@ -20,30 +21,21 @@ export default function Navbar({ openWindow }: NavbarProps) {
     useState(false);
   const [isAppleMenuOpen, setIsAppleMenuOpen] = useState(false);
 
-  // State to track if we're on a mobile device
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  // Use the shared mobile detection hook
+  const isMobile = useMobileDetection();
 
   // Status menu states for future functionality
   const [isBatteryMenuOpen, setIsBatteryMenuOpen] = useState(false);
   const [isWifiMenuOpen, setIsWifiMenuOpen] = useState(false);
   const [isControlCenterOpen, setIsControlCenterOpen] = useState(false);
 
+  // Update the time every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
-
-  // Effect to handle window resize for mobile detection
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const formatDate = (date: Date) => {
@@ -64,6 +56,9 @@ export default function Navbar({ openWindow }: NavbarProps) {
         "fixed top-0 left-0 right-0 h-9 flex items-center justify-between px-4 text-sm z-50 app-navbar transition-colors duration-300 backdrop-blur-xl",
         isDark ? "bg-gray-900/30 text-gray-300" : "bg-white/50 text-gray-900"
       )}
+      style={{
+        willChange: "backdrop-filter, background-color", // Optimize for GPU acceleration
+      }}
     >
       <button
         onClick={() => setIsAppleMenuOpen(true)}

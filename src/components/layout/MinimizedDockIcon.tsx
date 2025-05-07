@@ -43,6 +43,7 @@ export default function MinimizedDockIcon({
         scale,
         y,
         transformOrigin: "bottom center",
+        willChange: "transform, opacity", // Optimize for GPU acceleration
       }}
       className="relative group dock-icon"
     >

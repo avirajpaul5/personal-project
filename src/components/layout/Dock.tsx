@@ -1,5 +1,5 @@
 // Import necessary dependencies
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Window } from "../utils/types";
 import clsx from "clsx";
 import { motion } from "framer-motion";
@@ -9,14 +9,8 @@ import MinimizedDockIcon, { MinimizedDockIconProps } from "./MinimizedDockIcon";
 import { useDockMouseTracking } from "../../hooks/useDockAnimation";
 import { useTheme } from "../../contexts/ThemeContext";
 import { DockIconProps } from "./DockIcon";
-
-// Add icon preloading function
-const preloadIcons = (apps: Window[]) => {
-  apps.forEach((app) => {
-    const img = new Image();
-    img.src = app.icon;
-  });
-};
+import { useMobileDetection } from "../../hooks/useMobileDetection";
+import { imageCache } from "../../utils/preloader";
 
 // Define the props for the Dock component
 interface DockProps {
@@ -44,23 +38,8 @@ export default function Dock({
     null
   );
 
-  // State to track if we're on a mobile device
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  // Preload icons on component mount
-  useEffect(() => {
-    preloadIcons(apps);
-  }, [apps]);
-
-  // Effect to handle window resize
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  // Use the shared mobile detection hook
+  const isMobile = useMobileDetection();
 
   // Use the dock mouse tracking hook
   const { mouseX, handleMouseMove, handleMouseLeave } = useDockMouseTracking();
@@ -84,7 +63,10 @@ export default function Dock({
       <motion.div
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        style={dockStyle}
+        style={{
+          ...dockStyle,
+          willChange: "transform, opacity", // Optimize for GPU acceleration
+        }}
         className={clsx(
           "fixed left-1/2 -translate-x-1/2",
           isMobile ? "bottom-1" : "bottom-3",
