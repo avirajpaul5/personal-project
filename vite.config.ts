@@ -1,22 +1,44 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { splitVendorChunkPlugin } from "vite";
+// Removing splitVendorChunkPlugin as it's not compatible with manualChunks function
+// import { splitVendorChunkPlugin } from "vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), splitVendorChunkPlugin()],
+  plugins: [react()], // Removed splitVendorChunkPlugin
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Split React and related packages into a separate chunk
-          "react-vendor": ["react", "react-dom"],
-          // Split Framer Motion into its own chunk
-          "framer-motion": ["framer-motion"],
-          // Split other UI libraries
-          "ui-libs": ["sonner", "clsx", "cmdk", "react-rnd"],
-          // Split date utilities
-          "date-utils": ["date-fns", "date-fns-tz"],
+        manualChunks: (id) => {
+          // React and related packages
+          if (
+            id.includes("node_modules/react") ||
+            id.includes("node_modules/react-dom")
+          ) {
+            return "react-vendor";
+          }
+
+          // Framer Motion
+          if (id.includes("node_modules/framer-motion")) {
+            return "framer-motion";
+          }
+
+          // UI libraries
+          if (
+            id.includes("node_modules/sonner") ||
+            id.includes("node_modules/clsx") ||
+            id.includes("node_modules/cmdk") ||
+            id.includes("node_modules/react-rnd")
+          ) {
+            return "ui-libs";
+          }
+
+          // Date utilities
+          if (id.includes("node_modules/date-fns")) {
+            return "date-utils";
+          }
+
+          // Other vendor packages will be automatically chunked by Vite
         },
       },
     },
