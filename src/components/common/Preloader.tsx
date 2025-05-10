@@ -8,16 +8,17 @@ import { SplitText } from "gsap/SplitText";
 // Register the SplitText plugin
 gsap.registerPlugin(SplitText);
 
-// Array of Unsplash portrait images for the burst animation
+// Array of images for the burst animation
 const unsplashImages = [
-  "https://images.unsplash.com/photo-1627668572787-ec918bede4ae?q=80&w=384&h=520&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1515592565726-1356b4a020a6?q=80&w=384&h=520&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1641744473937-320ab5e7c035?q=80&w=384&h=520&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1696961305234-c56d9af60e34?q=80&w=384&h=520&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1730014393053-f5754fb19df5?q=80&w=384&h=520&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1617278735792-0ab0caff326a?q=80&w=384&h=520&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1650418988726-a03b31e504e3?q=80&w=384&h=520&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1729646063962-d711d75b9daa?q=80&w=384&h=520&auto=format&fit=crop",
+  // Images from public/assets/preLoader directory
+  "/assets/preLoader/image1.jpg",
+  "/assets/preLoader/image2.jpg",
+  "/assets/preLoader/image3.jpg",
+  "/assets/preLoader/image4.jpg",
+  "/assets/preLoader/image5.jpg",
+  "/assets/preLoader/image6.jpg",
+  "/assets/preLoader/image7.jpg",
+  "/assets/preLoader/image8.jpg",
 ];
 
 interface PreloaderProps {

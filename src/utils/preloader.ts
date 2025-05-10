@@ -18,7 +18,7 @@ export const preloadAppIcons = (apps: WindowType[]): Promise<void[]> => {
         resolve();
         return;
       }
-      
+
       const img = new Image();
       img.src = app.icon;
       img.onload = () => {
@@ -39,7 +39,7 @@ export const preloadAppIcons = (apps: WindowType[]): Promise<void[]> => {
       resolve();
       return;
     }
-    
+
     const img = new Image();
     img.src = launchpadIconPath;
     img.onload = () => {
@@ -60,23 +60,25 @@ export const preloadAppIcons = (apps: WindowType[]): Promise<void[]> => {
  * @param apps Array of app window objects
  * @returns Promise that resolves when all components are loaded
  */
-export const preloadEssentialComponents = async (apps: WindowType[]): Promise<void> => {
+export const preloadEssentialComponents = async (
+  apps: WindowType[]
+): Promise<void> => {
   // Preload app icons
   await preloadAppIcons(apps);
-  
+
   // Preload essential components
   const componentPromises = [
     // Import Navbar and Dock components
     import("../components/layout/Navbar"),
     import("../components/layout/Dock"),
-    
+
     // Import Window component
     import("../components/layout/Window"),
-    
+
     // Import DockIcon and LaunchpadIcon components
     import("../components/layout/DockIcon"),
     import("../components/layout/LaunchpadIcon"),
   ];
-  
+
   await Promise.all(componentPromises);
 };

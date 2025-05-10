@@ -48,7 +48,7 @@ export default function LaunchpadIcon({
         )}
       >
         <img
-          src="/assets/launchpad icon.png"
+          src="/public/assets/appIcons/launchpad icon.webp"
           alt="Launchpad"
           className={clsx(
             "transform transition-transform duration-200",

@@ -39,7 +39,7 @@ const initialApps: WindowType[] = [
   {
     id: "home",
     title: "Home",
-    icon: "/assets/home-icon.png", // Updated icon path
+    icon: "../public/assets/appIcons/home-icon.webp",
     isOpen: false,
     isMaximized: false,
     isMinimized: false,
@@ -59,7 +59,7 @@ const initialApps: WindowType[] = [
   {
     id: "about",
     title: "About",
-    icon: "/assets/About Icon.png",
+    icon: "../public/assets/appIcons/About Icon.webp",
     isOpen: false,
     isMaximized: false,
     isMinimized: false,
@@ -72,7 +72,7 @@ const initialApps: WindowType[] = [
   {
     id: "projects",
     title: "Projects",
-    icon: "/assets/projects icon.png",
+    icon: "../public/assets/appIcons/projects icon.webp",
     isOpen: false,
     isMaximized: false,
     isMinimized: false,
@@ -85,7 +85,7 @@ const initialApps: WindowType[] = [
   {
     id: "contact",
     title: "Contact",
-    icon: "/assets/Contact me icon.png",
+    icon: "../public/assets/appIcons/Contact me icon.webp",
     isOpen: false,
     isMaximized: false,
     isMinimized: false,
